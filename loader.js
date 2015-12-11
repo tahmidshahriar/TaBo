@@ -19,6 +19,9 @@ var userStatusDBname = "userStatuses";
 var statusContentDBname = "statusContents";
 var notificationDBname = "notifications";
 
+var credential = require('credential');
+var pw = credential();
+
 
 // UserID will be between 8 and 15 (inclusive) in length, and only contain
 // lowercase alphabets or 0 to 9
@@ -124,10 +127,16 @@ to do something for each element of an array... */
 var uploadPasswords = function(table, callback) {
 	async.forEach(passwords, function (password, callback) {
 	 console.log("Adding password: " + password[0]);
-	 table.put(password[0], password[1], function(err, data) {
-	   if (err)
-	     console.log("Oops, error when adding "+password[0]+": " + err);
-	 });
+
+  pw.hash(password[1], function (err, hash) {
+     table.put(password[0], hash, function(err, data) {
+     if (err)
+       console.log("Oops, error when adding "+password[0]+": " + err);
+    })   ;
+  })
+
+
+
 	}, callback);
 	}
 
