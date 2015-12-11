@@ -13,27 +13,123 @@ var async = require('async');
 
 /* Here is our initial data. */
 
+var passwordDBname = "passwords"
 var userDBname = "users";
-var restaurantDBname = "restaurants";
+var userStatusDBname = "userStatuses";
+var statusContentDBname = "statusContents";
+var notificationDBname = "notifications";
+
+
+// UserID will be between 8 and 15 (inclusive) in length, and only contain
+// lowercase alphabets or 0 to 9
+
+var passwords = [
+              ["changbo", "xdsdfsdgadf341"],
+              ["tahmids", "dsfasgere014"]
+                 ]
+
 
 var users = [
   [
-	  "mickey",
-	  JSON.stringify({"password" : "mouse", "fullname" : "Mickey Mouse"})
-  ]          
+	  "changbo",
+	  JSON.stringify({"confirmedFriends" : ["tahmids"], 
+		  	"pendingFriends" : [],
+		  	"mostRecentUpdate": "working on nets212",
+		  	"firstName": "Changbo",
+		  	"lastName": "Li",
+		  	"emailAddress": "lcbphilip@gmail.com",
+		  	"affiliation": "Penn",
+		  	"interestList": ["cycling", "singing"],
+		  	"birthday": "1992.10.12"
+	  })
+  ],
+  [
+		"tahmids",
+		JSON.stringify({"confirmedFriends" : ["changbo"], 
+	  	"pendingFriends" : [],
+	  	"mostRecentUpdate": "working on nets212",
+	  	"firstName": "Tahmid",
+	  	"lastName": "Shariar",
+	  	"emailAddress": "tahmids@seas.upenn.edu",
+	  	"affiliation": "Penn",
+	  	"interestList": ["drinking", "partying"],
+	  	"birthday": "2000.10.10"
+		})
+   
+   ]
+  
 ];
 
-var restaurants = [
+var userStatuses = [
     [
-     	"WhiteDog",
-     	JSON.stringify({"latitude": "39.953637", "longitude" : "-75.192883", "description" : "Very delicious", "creator": "micket"})
+     	"changbo",
+     	JSON.stringify(["1", "2"])
+	],
+    [
+  		"tahmids",
+  		JSON.stringify(["0"])
 	]
 
 ]
 
+var statusContents = [
+    ["0",
+		JSON.stringify({
+		  	"content": "finished hw4",
+		  	"creator": "changbo",
+		  	"host": "changbo",
+		  	"comments": [
+		  	             	{"commentor": "tahmids"
+		  	             	 "commentContent": "me too!"
+		  	            	 },
+		  	            	 {"commentor": "changbo"
+			  	             "commentContent": "lol" 
+		  	            	 }
+		  	             ]
+			})
+     ],
+    ["1",
+		JSON.stringify({
+		  	"content": "staring midterm now",
+		  	"creator": "tahmids",
+		  	"host": "tahmids",
+		  	"comments": [
+		  	             	{"commentor": "changbo"
+		  	             	 "commentContent": "gl"
+		  	            	 }
+		  	             ]
+			})
+	],
+	["2",
+		JSON.stringify({
+		  	"content": "let's start final project...",
+		  	"creator": "tahmids",
+		  	"host": "changbo",
+		  	"comments": []
+			})
+	]           
+]
+
+// notification tracks the most recent status updates from a user's friends
+
+var notifications = {
+		["changbo": JSON.stringify(["1"])],
+		["tahmids": JSON.stringify(["0"])]
+}
+
 
 /* This function uploads our data. Notice the use of 'async.forEach'
 to do something for each element of an array... */
+
+var uploadPasswords = function(table, callback) {
+	async.forEach(passwords, function (password, callback) {
+	 console.log("Adding password: " + password[0]);
+	 table.put(password[0], password[1], function(err, data) {
+	   if (err)
+	     console.log("Oops, error when adding "+password[0]+": " + err);
+	 });
+	}, callback);
+	}
 
 var uploadUsers = function(table, callback) {
 async.forEach(users, function (user, callback) {
@@ -45,15 +141,36 @@ async.forEach(users, function (user, callback) {
 }, callback);
 }
 
-var uploadRestaurants = function(table, callback) {
-	async.forEach(restaurants, function (restaurant, callback) {
-	 console.log("Adding restaurant: " + restaurant[0]);
-	 table.put(restaurant[0], restaurant[1], function(err, data) {
+var uploadUserStatuses = function(table, callback) {
+	async.forEach(userStatuses, function (userStatus, callback) {
+	 console.log("Adding userStatus: " + userStatus[0]);
+	 table.put(userStatus[0], userStatus[1], function(err, data) {
 	   if (err)
-	     console.log("Oops, error when adding "+restaurant[0]+": " + err);
+	     console.log("Oops, error when adding "+ userStatus[0]+": " + err);
 	 });
 	}, callback);
 }
+
+var uploadStatusContents = function(table, callback) {
+	async.forEach(statusContents, function (statusContent, callback) {
+	 console.log("Adding statusContent: " + statusContent[0]);
+	 table.put(statusContent[0], statusContent[1], function(err, data) {
+	   if (err)
+	     console.log("Oops, error when adding "+ statusContent[0]+": " + err);
+	 });
+	}, callback);
+}
+
+var uploadNotifications = function(table, callback) {
+	async.forEach(notifications, function (notification, callback) {
+	 console.log("Adding notification: " + notification[0]);
+	 table.put(notification[0], notification[1], function(err, data) {
+	   if (err)
+	     console.log("Oops, error when adding "+ notification[0]+": " + err);
+	 });
+	}, callback);
+}
+
 
 
 /* This function uploads our data. Notice the use of 'async.forEach'
@@ -73,9 +190,34 @@ var uploadRestaurants = function(table, callback) {
 /* So far we've only defined functions - the line below is the first line that
    is actually executed when we start the program. */   
 
-
-
-
+var h = 0;
+function setupPasswords(err, data) {
+  h++;
+  if (err && h != 2) {
+    console.log("Error: " + err); 
+  } else if (h==1) {
+    console.log("Deleting table " + passwordDBname+" if it already exists...");
+    params = {
+        "TableName": passwordDBname
+    }
+    db.deleteTable(params, function(){
+      console.log("Waiting 10s for the table to be deleted...")
+      setTimeout(setupPasswords,10000) // this may not be enough - increase if you're getting errors
+    })
+  } else if (h==2) {
+    console.log("Creating table "+ passwordDBname +"...");
+    table = new kvs(passwordDBname)
+    table.init(setupPasswords)
+  } else if (h==3) {
+    console.log("Waiting 10s for the table to become active...")
+    setTimeout(setupPasswords,10000) // this may not be enough - increase if you're getting errors
+  } else if (h==4) {
+    console.log("Uploading")
+    uploadPasswords(table, function(){
+      console.log("Done uploading!")
+    });
+  }
+}
 
 
 var i = 0;
@@ -108,43 +250,98 @@ function setupUsers(err, data) {
 }
 
 var j = 0;
-function setupRestaurants(err, data) {
+function setupUserStatuses(err, data) {
   j++;
   if (err && j != 2) {
     console.log("Error: " + err); 
   } else if (j==1) {
-    console.log("Deleting table "+restaurantDBname+" if it already exists...");
+    console.log("Deleting table "+ userStatusDBname +" if it already exists...");
     params = {
-        "TableName": restaurantDBname
+        "TableName": userStatusDBname
     }
     db.deleteTable(params, function(){
       console.log("Waiting 10s for the table to be deleted...")
-      setTimeout(setupRestaurants,10000) // this may not be enough - increase if you're getting errors
+      setTimeout(setupUserStatuses,10000) // this may not be enough - increase if you're getting errors
     })
   } else if (j==2) {
-    console.log("Creating table "+restaurantDBname+"...");
-    tableR = new kvs(restaurantDBname)
-    tableR.init(setupRestaurants)
+    console.log("Creating table "+userStatusDBname+"...");
+    tableR = new kvs(userStatusDBname)
+    tableR.init(setupUserStatuses)
   } else if (j==3) {
     console.log("Waiting 10s for the table to become active...")
-    setTimeout(setupRestaurants,10000) // this may not be enough - increase if you're getting errors
+    setTimeout(setupUserStatuses,10000) // this may not be enough - increase if you're getting errors
   } else if (j==4) {
     console.log("Uploading")
-    uploadRestaurants(tableR, function(){
+    uploadUserStatuses(tableR, function(){
+      console.log("Done uploading!")
+    });
+  }
+}
+
+var k = 0;
+function setupStatusContents(err, data) {
+  k++;
+  if (err && k != 2) {
+    console.log("Error: " + err); 
+  } else if (k==1) {
+    console.log("Deleting table "+ statusContentDBname +" if it already exists...");
+    params = {
+        "TableName": statusContentDBname
+    }
+    db.deleteTable(params, function(){
+      console.log("Waiting 10s for the table to be deleted...")
+      setTimeout(setupStatusContents,10000) // this may not be enough - increase if you're getting errors
+    })
+  } else if (k==2) {
+    console.log("Creating table "+statusContentDBname+"...");
+    tableR = new kvs(statusContentDBname)
+    tableR.init(setupStatusContents)
+  } else if (k==3) {
+    console.log("Waiting 10s for the table to become active...")
+    setTimeout(setupStatusContents,10000) // this may not be enough - increase if you're getting errors
+  } else if (k==4) {
+    console.log("Uploading")
+    uploadStatusContents(tableR, function(){
       console.log("Done uploading!")
     });
   }
 }
 
 
-setupRestaurants(null, null)
+var l = 0;
+function setupNotifications(err, data) {
+  l++;
+  if (err && l != 2) {
+    console.log("Error: " + err); 
+  } else if (l==1) {
+    console.log("Deleting table "+ notificationDBname +" if it already exists...");
+    params = {
+        "TableName": notificationDBname
+    }
+    db.deleteTable(params, function(){
+      console.log("Waiting 10s for the table to be deleted...")
+      setTimeout(setupNotifications,10000) // this may not be enough - increase if you're getting errors
+    })
+  } else if (l==2) {
+    console.log("Creating table "+notificationDBname+"...");
+    tableR = new kvs(notificationDBname)
+    tableR.init(setupNotifications)
+  } else if (l==3) {
+    console.log("Waiting 10s for the table to become active...")
+    setTimeout(setupNotifications,10000) // this may not be enough - increase if you're getting errors
+  } else if (l==4) {
+    console.log("Uploading")
+    uploadNotifications(tableR, function(){
+      console.log("Done uploading!")
+    });
+  }
+}
+
+
+setupPasswords(null, null)
 setupUsers(null, null)
-
-
-
-
-
-
-
+setupUserStatuses(null, null)
+setupStatusContents(null, null)
+setupNotifications(null, null)
 
 
