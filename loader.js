@@ -225,6 +225,7 @@ function setupPasswords(err, data) {
     uploadPasswords(table, function(){
       console.log("Done uploading!")
     });
+    setTimeout(setupUsers,5000);
   }
 }
 
@@ -255,6 +256,7 @@ function setupUsers(err, data) {
     uploadUsers(table, function(){
       console.log("Done uploading!")
     });
+    setTimeout(setupUserStatuses,5000);
   }
 }
 
@@ -284,6 +286,7 @@ function setupUserStatuses(err, data) {
     uploadUserStatuses(tableR, function(){
       console.log("Done uploading!")
     });
+    setTimeout(setupStatusContents,5000);
   }
 }
 
@@ -313,6 +316,7 @@ function setupStatusContents(err, data) {
     uploadStatusContents(tableR, function(){
       console.log("Done uploading!")
     });
+    setTimeout(setupNotifications,5000);
   }
 }
 
@@ -348,9 +352,5 @@ function setupNotifications(err, data) {
 
 
 setupPasswords(null, null)
-setupUsers(null, null)
-setupUserStatuses(null, null)
-setupStatusContents(null, null)
-setupNotifications(null, null)
 
 
