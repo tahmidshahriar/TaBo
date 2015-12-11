@@ -116,8 +116,8 @@ var statusContents = [
 // notification tracks the most recent status updates from a user's friends
 
 var notifications = [
-		["changbo": JSON.stringify(["1"])],
-		["tahmids": JSON.stringify(["0"])]
+		["changbo", JSON.stringify(["1"])],
+		["tahmids", JSON.stringify(["0"])]
 ]
 
 
