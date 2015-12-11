@@ -79,10 +79,10 @@ var statusContents = [
 		  	"creator": "changbo",
 		  	"host": "changbo",
 		  	"comments": [
-		  	             	{"commentor": "tahmids"
+		  	             	{"commentor": "tahmids",
 		  	             	 "commentContent": "me too!"
 		  	            	 },
-		  	            	 {"commentor": "changbo"
+		  	            	 {"commentor": "changbo",
 			  	             "commentContent": "lol" 
 		  	            	 }
 		  	             ]
@@ -94,7 +94,7 @@ var statusContents = [
 		  	"creator": "tahmids",
 		  	"host": "tahmids",
 		  	"comments": [
-		  	             	{"commentor": "changbo"
+		  	             	{"commentor": "changbo",
 		  	             	 "commentContent": "gl"
 		  	            	 }
 		  	             ]
@@ -113,8 +113,8 @@ var statusContents = [
 // notification tracks the most recent status updates from a user's friends
 
 var notifications = {
-		["changbo": JSON.stringify(["1"])],
-		["tahmids": JSON.stringify(["0"])]
+		"changbo": JSON.stringify(["1"]),
+		"tahmids": JSON.stringify(["0"])
 }
 
 
