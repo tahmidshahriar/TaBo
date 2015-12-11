@@ -7,11 +7,6 @@ kvsUser.init(function(err, data) {
 	console.log("User table loaded")
 });
 
-kvsRestaurant = new keyvaluestore('restaurants');
-kvsRestaurant.init(function(err, data) {
-	console.log("Restaurant table loaded")
-});
-
 
 /*
  * The function below is an example of a database method. Whenever you need to
@@ -85,8 +80,8 @@ var myDB_signin = function(username, password, route_callbck) {
 
 
 
-var myDB_restaurant = function(route_callbck) {
-	kvsRestaurant.scanKeyVal(function(err, data) {
+var myDB_home = function(route_callbck) {
+	kvsUser.scanKeyVal(function(err, data) {
 		if (err) {
 			route_callbck(null, "Lookup error: " + err);
 		} else if (data == null) {
@@ -97,37 +92,6 @@ var myDB_restaurant = function(route_callbck) {
 			}, null);
 		}
 
-	});
-};
-
-var myDB_addrestaurant = function(long, lat, name, desc, creator,route_callbck) {
-	if (long == "" || lat == "" || name == "" || lat == "") {
-		route_callbck({
-			translation : "Fill out all the fields"
-		}, null);
-	} else {
-				kvsRestaurant.put(name, JSON.stringify({
-					"latitude" : lat,
-					"longitude" : long,
-					"description" : desc,
-					"creator" : creator
-				}), function(err, data) {
-					if (err) {
-						route_callbck(null, "Put error: " + err);
-					} else {
-						route_callbck({
-							translation : "Created"
-						}, null);
-					}
-				})
-
-	}
-};
-
-
-var myDB_delrestaurant = function(key, inx, route_callbck) {
-	kvsRestaurant.remove(key, inx, function(err, data) {
-		route_callbck(null, err);
 	});
 };
 
@@ -142,9 +106,7 @@ var myDB_delrestaurant = function(key, inx, route_callbck) {
 var database = {
 	signin : myDB_signin,
 	signup : myDB_signup,
-	restaurant : myDB_restaurant,
-	addrestaurant : myDB_addrestaurant,
-	delr : myDB_delrestaurant
+	home : myDB_home
 };
 
 module.exports = database;

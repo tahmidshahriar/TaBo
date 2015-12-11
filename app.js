@@ -22,15 +22,8 @@ app.get('/', routes.get_main);
 app.post('/checklogin', routes.post_login);
 app.get('/signup', routes.get_signup);
 app.post('/createaccount', routes.post_createaccount);
-app.get('/restaurants', routes.get_restaurant);
-app.post('/addrestaurant', routes.post_restaurant);
+app.get('/home', routes.get_home);
 app.get('/signout', routes.get_signout);
-app.get('/ajaxr', routes.get_ajaxr);
-app.post('/delr', routes.post_delr);
-
-
-
-
 /* Run the server */
 
 console.log('Author: Tahmid Shahriar (tahmids)');

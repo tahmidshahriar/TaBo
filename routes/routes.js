@@ -10,7 +10,7 @@ var signout = function(req, res) {
 	
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
-		res.redirect('/restaurants')
+		res.redirect('/home')
 	}
 	
 	sess.user = null
@@ -30,7 +30,7 @@ var checkLogin = function(req, res) {
 			var sess = req.session
 			sess.user = data.name
 			if (data.translation == "Logged In") {
-				res.redirect('/restaurants');
+				res.redirect('/home');
 			} else {
 				res.render('main.ejs', {
 					message : data.translation,
@@ -54,14 +54,14 @@ var signup = function(req, res) {
 			});
 };
 
-var restaurant = function(req, res) {
+var home = function(req, res) {
 	sess = req.session;
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/')
 	}
-	db.restaurant(function (data, err) {
+	db.home(function (data, err) {
 		if (err) {
-			res.render('restaurant.ejs', {
+			res.render('home.ejs', {
 				message : err,
 				val: null,
 				footer : "Tahmid Shahriar (tahmids)",
@@ -71,8 +71,8 @@ var restaurant = function(req, res) {
 			
 			
 		} else if (data == null) {
-			res.render('restaurant.ejs', {
-				message : "No restaurant",
+			res.render('home.ejs', {
+				message : "No users",
 				val : null,
 				footer : "Tahmid Shahriar (tahmids)",
 					user : sess.user
@@ -81,7 +81,7 @@ var restaurant = function(req, res) {
 			
 		} else {
 			
-			res.render('restaurant.ejs', {
+			res.render('home.ejs', {
 				message : "",
 				val: data.translation,
 				footer : "Tahmid Shahriar (tahmids)",
@@ -93,22 +93,6 @@ var restaurant = function(req, res) {
 		
 	})
 
-};
-
-var ajaxr = function(req, res) {
-	db.restaurant(function (data, err) {
-		res.json(data.translation)	
-	})
-};
-
-var delr = function(req, res) {
-	var key = req.body.key;
-	var inx = req.body.inx;
-	console.log(key)
-	console.log(inx)
-	db.delr(key, inx, function (data, err) {
-		res.json(data)
-	})
 };
 
 
@@ -126,7 +110,7 @@ var createaccount = function(req, res) {
 			if (data.translation == "Created") {
 				var sess = req.session
 				sess.user = data.name
-				res.redirect('/restaurants');
+				res.redirect('/home');
 			} else {
 				res.render('signup.ejs', {
 					message : data.translation,
@@ -136,34 +120,15 @@ var createaccount = function(req, res) {
 		}});
 };
 
-
-
-var addrestaurant = function(req, res) {
-	sess = req.session;
-	if (!sess.user || sess.user == null) {
-		res.redirect('/')
-	}
-	var long = req.body.long;
-	var lat = req.body.lat;
-	var name = req.body.name;
-	var desc = req.body.desc;
+var signout = function(req, res) {
 	
-	db.addrestaurant(long, lat, name, desc, sess.user, function(data, err) {
-		if (err) {
-			res.render('restaurant.ejs', {
-				message : err,
-				footer : "Tahmid Shahriar (tahmids)"
-			});
-		} else if (data) {
-			if (data.translation == "Created") {
-				res.redirect('/restaurants');
-			} else {
-				res.render('restaurant.ejs', {
-					message : data.translation,
-					footer : "Tahmid Shahriar (tahmids)"
-				});
-			}
-		}});
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/restaurants')
+	}
+	
+	sess.user = null
+	res.redirect('/')
 };
 
 var routes = {
@@ -171,12 +136,8 @@ var routes = {
 	post_login : checkLogin,
 	post_createaccount : createaccount,
 	get_signup : signup,
-	get_restaurant : restaurant,
-	post_restaurant : addrestaurant,
 	get_signout : signout,
-	get_ajaxr : ajaxr,
-	post_delr : delr
-	
+	get_home : home	
 };
 
 module.exports = routes;
