@@ -115,10 +115,10 @@ var statusContents = [
 
 // notification tracks the most recent status updates from a user's friends
 
-var notifications = {
-		"changbo": JSON.stringify(["1"]),
-		"tahmids": JSON.stringify(["0"])
-}
+var notifications = [
+		["changbo": JSON.stringify(["1"])],
+		["tahmids": JSON.stringify(["0"])]
+]
 
 
 /* This function uploads our data. Notice the use of 'async.forEach'
@@ -351,6 +351,6 @@ function setupNotifications(err, data) {
 }
 
 
-setupPasswords(null, null)
+setupPasswords(null, null);
 
 
