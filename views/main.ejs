@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+ <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
+
+	
+  <h1>Login Page</h1>
+    <%if (message != null) { %>
+  <font color="red"><%= message %><p> </font>
+  <% } %>
+  
+  <form action="/checklogin" method="post">
+    <input type="text" placeholder="Enter name" name="user">
+    <input type="text" placeholder="Enter password" name="pass">
+    <input type="submit" value="Login">
+  </form>
+  
+  
+  <a href="/signup" class="button"> Signup </a>
+  
+  
+  
+</body>
+<footer>
+
+	<%if (footer != null) { %>
+	  <%= footer %><p>
+  	<% } %>
+</footer>
+</html>

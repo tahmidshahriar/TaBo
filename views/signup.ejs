@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body>
+ <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
+
+	
+  <h1>Login Page</h1>
+    <%if (message != null) { %>
+  <font color="red"><%= message %><p> </font>
+  <% } %>
+  
+  <form action="/createaccount" method="post">
+    <input type="text" placeholder="Enter username" name="user" required>
+    <input type="text" placeholder="Enter password" name="pass" required>
+    <input type="text" placeholder="Enter full name" name="fullname" required>
+    <input type="submit" value="Create">
+  </form>
+  
+  
+  
+  
+</body>
+<footer>
+
+	<%if (footer != null) { %>
+	  <%= footer %><p>
+  	<% } %>
+</footer>
+</html>

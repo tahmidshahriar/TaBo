@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head> 
+
+</head>
+<body>
+ <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    
+<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+ <script type="text/javascript">
+    var map;
+	var redMarker = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+    var yellowMarker = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+    
+    
+    var loadMap = function() {
+        var myOptions = {
+               center: new google.maps.LatLng(39.952335, -75.163789),
+               zoom: 11,
+               mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        
+      map = new google.maps.Map(document.getElementById("map"), myOptions);
+		google.maps.event.addListener(map, 'click',
+			function( event ){
+			   	document.getElementById('lat').value
+			 	= event.latLng.lat();
+			 	document.getElementById('long').value
+			 	= event.latLng.lng();
+		    }		   
+		);
+
+	<% for (var i = 0; i < val.length; i++) { %>
+		
+		lo =   parseFloat(<%= val[i]['value']['longitude'] %>)
+		la =   parseFloat(<%= val[i]['value']['latitude'] %>)
+		pos = new google.maps.LatLng(la, lo)
+		key = "<%= val[i]['key'] %>"
+		des = "<%= val[i]['value']['description'] %>"
+		cr = "<%= val[i]['value']['creator'] %>"
+		ic = redMarker
+		inx = "<%= val[i]['inx'] %>"
+		
+		if (cr == "<%= user %>") {
+			ic = yellowMarker
+		}
+		
+		var marker = new google.maps.Marker({
+			position: pos,
+			map: map,
+			draggable: false,
+			icon: ic,
+			inx: inx
+		});
+		marker.setMap(map)
+		
+		contentS = '<b>' + key + '</b><br>' + des + '<br>' + '<i> Added by ' + cr + '</i>'
+		
+		marker['infoWindow'] = new google.maps.InfoWindow({
+			content : contentS
+		})
+		
+		
+		google.maps.event.addListener(marker, 'click', function() {
+			this['infoWindow'].open(map, this)
+		})
+		
+		if (cr != "<%= user %>") {
+			google.maps.event.addListener(marker, 'rightclick', function() {
+				alert("Not your marker")
+			})
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		 else {
+			google.maps.event.addListener(marker, 'rightclick', function() {
+				k = this['key']
+				i = parseInt(this['inx'])
+				var formData = {
+            'key'              : k,
+            'inx'             :  i,
+        	};
+				
+			$.ajax({
+	            type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+	            url         : '/delr', // the url where we want to POST
+	            data        : formData, // our data object
+        	})
+            .done(function() {
+        		map = null
+		
+				$.ajax({
+					url: '/ajaxr',
+					dataType: 'json'
+				}).done(function (res) {	
+				loadMapAjax(res)
+				
+			})
+		})
+		
+		})}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	<% } %>	
+
+    };
+    window.onload = function() { loadMap(); formLoad(); }
+
+	var formLoad = function() {
+	$("#form").submit(function(event) {
+		console.log("Click")
+		lo =   $('input[name=long]').val()
+		la =   $('input[name=lat]').val()
+		pos = new google.maps.LatLng(la, lo)
+		key = $('input[name=name]').val()
+		des = $('input[name=desc]').val()
+		cr = "<%= user %>"
+		ic = redMarker
+		
+		if (cr == "<%= user %>") {
+			ic = yellowMarker
+		}
+		
+       
+        var formData = {
+            'name'              : $('input[name=name]').val(),
+            'lat'             : $('input[name=lat]').val(),
+            'long'    : $('input[name=long]').val(),
+            'desc'    : $('input[name=desc]').val(),
+        };
+
+        // process the form
+        $.ajax({
+            type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+            url         : '/addrestaurant', // the url where we want to POST
+            data        : formData, // our data object
+        })
+            .done(function() {
+        map = null
+		$.ajax({
+			url: '/ajaxr',
+			dataType: 'json'
+		}).done(function (res) {
+			
+			loadMapAjax(res)
+		
+		})
+	
+            
+            })
+                // stop the form from submitting the normal way and refreshing the page
+        event.preventDefault();
+    });
+	}
+	
+	window.setInterval(function() {
+		map = null
+		$.ajax({
+			url: '/ajaxr',
+			dataType: 'json'
+		}).done(function (res) {
+			
+			loadMapAjax(res)
+		
+		})
+	}, 5000)
+
+	var loadMapAjax = function(val) {
+	map = null;
+        var myOptions = {
+               center: new google.maps.LatLng(39.952335, -75.163789),
+               zoom: 11,
+               mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        
+      map = new google.maps.Map(document.getElementById("map"), myOptions);
+
+		google.maps.event.addListener(map, 'click',
+			function( event ){
+			   	document.getElementById('lat').value
+			 	= event.latLng.lat();
+			 	document.getElementById('long').value
+			 	= event.latLng.lng();
+		    }		   
+		);
+
+	for (var i = 0; i < val.length; i++){
+		lo =   parseFloat(val[i]['value']['longitude'])
+		la =   parseFloat(val[i]['value']['latitude'])
+		pos = new google.maps.LatLng(la, lo)
+		key = String(val[i]['key'])
+		des = String(val[i]['value']['description'])
+		cr = val[i]['value']['creator']
+		ic = redMarker
+		inx = String(val[i]['inx'])
+		if (cr == "<%= user %>") {
+			ic = yellowMarker
+		}
+		
+		var marker = new google.maps.Marker({
+			key: key,
+			position: pos,
+			map: map,
+			draggable: false,
+			icon: ic,
+			inx: inx
+		});
+		marker.setMap(map)
+		
+		contentS = '<b>' + key + '</b><br>' + des + '<br>' + '<i> Added by ' + cr + '</i>'
+		
+		marker['infoWindow'] = new google.maps.InfoWindow({
+			content : contentS
+		})
+		
+		
+		google.maps.event.addListener(marker, 'click', function() {
+			this['infoWindow'].open(map, this)
+		})
+		
+		
+		if (cr != "<%= user %>") {
+			google.maps.event.addListener(marker, 'rightclick', function() {
+				alert("Not your marker")
+			})
+		} else {
+			google.maps.event.addListener(marker, 'rightclick', function() {
+				k = this['key']
+				i = parseInt(this['inx'])
+				var formData = {
+            'key'              : k,
+            'inx'             :  i,
+        };
+				
+				$.ajax({
+            type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+            url         : '/delr', // the url where we want to POST
+            data        : formData, // our data object
+        })
+            .done(function() {
+        map = null
+		$.ajax({
+			url: '/ajaxr',
+			dataType: 'json'
+		}).done(function (res) {
+			
+			loadMapAjax(res)
+		
+		})
+				
+				
+			
+			})
+		})
+		}
+	}
+
+    };
+    
+    
+    
+    
+
+
+
+  </script>
+
+
+<div id="map" style="width:500px;height:500px;"></div>
+
+  <h1>Lookup results</h1>
+  <%= message %><p>
+
+	<%if (val != null) { %>
+	<table border = "1">
+	<tr> <th> Name </th> <th> Latitude </th> <th> Longitude </th> <th> Description </th> <th> Creator </th> </tr> 
+	<% val.forEach(function(v) { %>
+	  	<tr>
+	  	<td> <%= v['key'] %> </td>
+	  	<td> <%= v['value']["latitude"] %> </td>
+		<td> <%= v['value']["longitude"] %> </td>
+		<td> <%= v['value']["description"] %> </td>
+		<td> <%= v['value']["creator"] %> </td>
+		</tr>
+
+
+
+  	<% }) %>
+  	</table>
+  	<% } %>
+
+
+	<form id="form" method="post" name="form">
+	    <input type="text" placeholder="Enter latitude" name="lat" id="lat" required>
+	    <input type="text" placeholder="Enter longitude" name="long" id= "long" required>
+	    <input type="text" placeholder="Enter name" name="name" required>
+	    <input type="text" placeholder="Enter description" name="desc" required>
+	    <input id = "submit" type="submit" value="Submit">
+  	</form>
+
+<a href="/signout" class="button"> Signout </a>
+    
+    
+</body>
+
+
+<footer>
+	<%if (footer != null) { %>
+	  <%= footer %><p>
+  	<% } %>
+</footer>
+
+    
+</html>
+
+
