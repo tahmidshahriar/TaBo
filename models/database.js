@@ -1,6 +1,8 @@
 var keyvaluestore = require('../models/keyvaluestore.js');
 var kvsUser
 var kvsRestaurants
+var credential = require('credential');
+var pw = credential();
 
 kvsUser = new keyvaluestore('users');
 kvsUser.init(function(err, data) {
@@ -63,7 +65,11 @@ var myDB_signin = function(username, password, route_callbck) {
 			route_callbck(null, null);
 		} else {
 			json = JSON.parse(data[0].value)
-			if (json.password == password) {
+
+
+pw.verify(json.password, password, function (err, isValid) {
+  if (err) { throw err; }
+			if (isValid) {
 				route_callbck({
 					translation : "Logged In",
 					name : username
@@ -73,6 +79,12 @@ var myDB_signin = function(username, password, route_callbck) {
 					translation : "Invalid Password"
 				}, null);
 			}
+		});
+
+
+
+
+
 		}
 	});
 };

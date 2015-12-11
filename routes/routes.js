@@ -1,4 +1,6 @@
 var db = require('../models/database.js');
+var credential = require('credential');
+var pw = credential();
 var getMain = function(req, res) {
 	res.render('main.ejs', {
 		message : "",
@@ -20,6 +22,7 @@ var signout = function(req, res) {
 var checkLogin = function(req, res) {
 	var user = req.body.user;
 	var pass = req.body.pass;
+	
 	db.signin(user, pass, function(data, err) {
 		if (err) {
 			res.render('main.ejs', {
@@ -99,25 +102,33 @@ var home = function(req, res) {
 var createaccount = function(req, res) {
 	var user = req.body.user;
 	var pass = req.body.pass;
-	var name = req.body.fullname;
-	db.signup(user, pass, name, function(data, err) {
-		if (err) {
-			res.render('signup.ejs', {
-				message : err,
-				footer : "Tahmid Shahriar (tahmids)"
-			});
-		} else if (data) {
-			if (data.translation == "Created") {
-				var sess = req.session
-				sess.user = data.name
-				res.redirect('/home');
-			} else {
+	pw.hash(pass, function (err, hash) {
+ 		if (err) { throw err; }
+		var name = req.body.fullname;
+		db.signup(user, hash, name, function(data, err) {
+			if (err) {
 				res.render('signup.ejs', {
-					message : data.translation,
+					message : err,
 					footer : "Tahmid Shahriar (tahmids)"
 				});
-			}
-		}});
+			} else if (data) {
+				if (data.translation == "Created") {
+					var sess = req.session
+					sess.user = data.name
+					res.redirect('/home');
+				} else {
+					res.render('signup.ejs', {
+						message : data.translation,
+						footer : "Tahmid Shahriar (tahmids)"
+					});
+				}
+			}});
+
+
+
+	});
+	
+
 };
 
 var signout = function(req, res) {
