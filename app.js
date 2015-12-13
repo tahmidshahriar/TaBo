@@ -20,12 +20,11 @@ app.use(session( {secret : 'hw', user : ""  } ))
 
 app.get('/', routes.get_main);
 app.post('/checklogin', routes.post_login);
-app.get('/signup', routes.get_signup);
 app.post('/createaccount', routes.post_createaccount);
 app.get('/home', routes.get_home);
 app.get('/signout', routes.get_signout);
+app.get('/profile/:user', routes.get_homeOther);
 /* Run the server */
 
-console.log('Author: Tahmid Shahriar (tahmids)');
 app.listen(8080);
 console.log('Server running on port 8080. Now open http://localhost:8080/ in your browser!');

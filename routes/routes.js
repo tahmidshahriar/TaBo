@@ -2,9 +2,14 @@ var db = require('../models/database.js');
 var credential = require('credential');
 var pw = credential();
 var getMain = function(req, res) {
+	var sess = req.session
+	if ( (!sess.user  || sess.user == null) == false) {
+		res.redirect("/home");
+	}
+
 	res.render('main.ejs', {
 		message : "",
-		footer: "Tahmid Shahriar (tahmids)"
+		footer: "TaBo"
 	})
 };
 
@@ -27,7 +32,7 @@ var checkLogin = function(req, res) {
 		if (err) {
 			res.render('main.ejs', {
 				message : err,
-				footer : "Tahmid Shahriar (tahmids)"
+				footer : "TaBo"
 			});
 		} else if (data) {
 			var sess = req.session
@@ -37,95 +42,131 @@ var checkLogin = function(req, res) {
 			} else {
 				res.render('main.ejs', {
 					message : data.translation,
-					footer : "Tahmid Shahriar (tahmids)"
+					footer : "TaBo"
 				});
 			}
 		} else {
 			res.render('main.ejs', {
 				message : "Username Invalid",
-				footer : "Tahmid Shahriar (tahmids)"
+				footer : "TaBo"
 			});
 		}
 	});
 };
 
 
-var signup = function(req, res) {
-			res.render('signup.ejs', {
-				message : "",
-				footer : "Tahmid Shahriar (tahmids)"
-			});
-};
-
 var home = function(req, res) {
 	sess = req.session;
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/')
 	}
-	db.home(function (data, err) {
-		if (err) {
-			res.render('home.ejs', {
-				message : err,
-				val: null,
-				footer : "Tahmid Shahriar (tahmids)",
-				user : sess.user
 
-			});
-			
-			
-		} else if (data == null) {
-			res.render('home.ejs', {
-				message : "No users",
-				val : null,
-				footer : "Tahmid Shahriar (tahmids)",
+	db.status(sess.user, function (data, err) {
+		current = data.translation;
+		db.profile(sess.user, function(data, err) {
+			if (err) {
+				res.render('home.ejs', {
+					message : err,
+					news: null,
+					footer : "TaBo",
 					user : sess.user
-			});
-			
-			
-		} else {
-			
-			res.render('home.ejs', {
-				message : "",
-				val: data.translation,
-				footer : "Tahmid Shahriar (tahmids)",
-				user : sess.user
-			});
-			
-		}
-		
-		
-	})
 
+				});
+				
+				
+			} else if (data == null) {
+				res.render('home.ejs', {
+					message : "No users",
+					news : null,
+					footer : "TaBo",
+						user : sess.user
+				});
+				
+				
+			} else {
+				console.log(current);
+				res.render('home.ejs', {
+					message : "",
+					news: current,
+					footer : "TaBo",
+					user : sess.user,
+					prof : data.translation
+				});	
+			}
+		})
+	})
 };
 
+var homeOther = function(req, res) {
+	sess = req.session;
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/')
+	}
+
+	db.status(req.params.user, function (data, err) {
+		if (data == null) {
+			res.redirect("/");
+		} else {
+			console.log("HEREEE")
+			current = data.translation;
+			db.profile(req.params.user, function(data, err) {
+				if (err) {
+					res.render('home.ejs', {
+						message : err,
+						news: null,
+						footer : "TaBo",
+						user : req.params.user
+
+					});
+					
+				} else if (data == null) {
+					res.redirect("/");
+				} else {
+					console.log(current);
+					res.render('home.ejs', {
+						message : "",
+						news: current,
+						footer : "TaBo",
+						user : req.params.user,
+						prof : data.translation
+					});	
+				}
+			})
+		}
+	})
+};
 
 var createaccount = function(req, res) {
 	var user = req.body.user;
 	var pass = req.body.pass;
+	var first = req.body.first;
+	var last = req.body.last;
+	var email = req.body.email;
+	var affiliation = req.body.affiliation;
+	var interest = req.body.interest;
+	var birthday = req.body.birthday;
+
 	pw.hash(pass, function (err, hash) {
- 		if (err) { throw err; }
-		var name = req.body.fullname;
-		db.signup(user, hash, name, function(data, err) {
+		db.signupPassword(user, hash, function(data, err) {
 			if (err) {
-				res.render('signup.ejs', {
+				res.render('main.ejs', {
 					message : err,
-					footer : "Tahmid Shahriar (tahmids)"
+					footer : "TaBo"
 				});
 			} else if (data) {
 				if (data.translation == "Created") {
 					var sess = req.session
 					sess.user = data.name
-					res.redirect('/home');
+					db.signupUser(user, first, last, email, affiliation, interest, birthday, function(data, err) {
+						res.redirect('/home');
+					})
 				} else {
-					res.render('signup.ejs', {
+					res.render('main.ejs', {
 						message : data.translation,
-						footer : "Tahmid Shahriar (tahmids)"
+						footer : "TaBo"
 					});
 				}
 			}});
-
-
-
 	});
 	
 
@@ -146,9 +187,9 @@ var routes = {
 	get_main : getMain,
 	post_login : checkLogin,
 	post_createaccount : createaccount,
-	get_signup : signup,
 	get_signout : signout,
-	get_home : home	
+	get_home : home,
+	get_homeOther : homeOther
 };
 
 module.exports = routes;

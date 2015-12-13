@@ -4,30 +4,53 @@
  <link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
 
 	
-
-
-
-  <h1>Login Page</h1>
+<div class = "container-fluid">
+<div class="panel">
+ <div class="row" style="background-color: #6699ff; color: white; ">
+ <div class="col-xs-6 loginbox">
+  <h4>Welcome to TaBo</h4>
     <%if (message != null) { %>
-  <font color="red"><%= message %><p> </font>
-  <% } %>
-  
-  <form action="/checklogin" method="post">
-    <input type="text" placeholder="Enter name" name="user">
-    <input type="text" placeholder="Enter password" name="pass">
-    <input type="submit" value="Login">
+  <font color="red"> <p> <%= message %></p> </font>
+  <% } %>   
+ </div>
+ <div class="col-xs-6 pull-right centered">
+ <form class="pull-right border" action="/checklogin" method="post">
+    <input style="color:black" type="text" placeholder="Enter name" name="user">
+    <input style="color:black" type="password" placeholder="Enter password" name="pass">
+    <input style="color:black" type="submit" value="Login" style="background-color: black">
   </form>
-  
-  
-  <a href="/signup" class="button"> Signup </a>
-  
-  
-  
-</body>
-<footer>
+  </div>
+ </div>
 
-	<%if (footer != null) { %>
-	  <%= footer %><p>
-  	<% } %>
-</footer>
+<div class="row">
+  <div class="col-xs-3">
+    <br><br><br>
+    <form action="/createaccount" method="post">
+    <ul>
+    <li> <input style="width: 100%" type="text" placeholder="Username" name="user" required> </li>
+    <li> <input style="width: 100%" type="password" placeholder="Password" name="pass" required> </li>
+    <li> <input style="width: 100%" type="text" placeholder="First name" name="firstname" required> </li>
+    <li> <input style="width: 100%" type="text" placeholder="Last name" name="lastname" required> </li>
+    <li> <input style="width: 100%" type="text" placeholder="Email address" name="email" required> </li>
+    <li> <input style="width: 100%" type="text" placeholder="Affiliation" name="affiliation" required> </li>
+    <li> <input style="width: 100%" type="date" placeholder="Birthday" name="firstname" required> </li>
+    <li> <input style="width: 100%" type="text" placeholder="Interest" name="firstname" required> </li>
+    <br>
+    <button class="btn-large" type="submit">Sign Up</button>
+    </ul>
+  </form>
+  </div>
+<div class="col-xs-9 centered" style="background-image:url () "> 
+<img src="https://www.basf.com/etc/designs/basf/wcms/base/images/components/content/joboffers/world-map-black.png" style="opacity: 0.4">
+</div>
+</div>
+
+</div>
+</div>
+
+
+</div>
+
+    
+</body>
 </html>

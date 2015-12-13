@@ -10,10 +10,17 @@
   <% } %>
   
   <form action="/createaccount" method="post">
-    <input type="text" placeholder="Enter username" name="user" required>
-    <input type="text" placeholder="Enter password" name="pass" required>
-    <input type="text" placeholder="Enter full name" name="fullname" required>
+    <ul>
+    <li> <input type="text" placeholder="Username" name="user" required> </li>
+    <li> <input type="password" placeholder="Password" name="pass" required> </li>
+    <li> <input type="text" placeholder="First name" name="firstname" required> </li>
+    <li> <input type="text" placeholder="Last name" name="lastname" required> </li>
+    <li> <input type="text" placeholder="Email address" name="email" required> </li>
+    <li> <input type="text" placeholder="Affiliation" name="affiliation" required> </li>
+    <li> <input type="date" placeholder="Birthday" name="firstname" required> </li>
+    <li> <input type="text" placeholder="Interest" name="firstname" required> </li>
     <input type="submit" value="Create">
+    </ul>
   </form>
   
   

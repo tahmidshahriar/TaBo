@@ -28,7 +28,7 @@ var pw = credential();
 
 var passwords = [
               ["changbo", "xdsdfsdgadf341"],
-              ["tahmids", "dsfasgere014"]
+              ["tahmids", "dino"]
                  ]
 
 
@@ -37,7 +37,7 @@ var users = [
 	  "changbo",
 	  JSON.stringify({"confirmedFriends" : ["tahmids"], 
 		  	"pendingFriends" : [],
-		  	"mostRecentUpdate": "working on nets212",
+		  	"mostRecentUpdate": "finished hw4",
 		  	"firstName": "Changbo",
 		  	"lastName": "Li",
 		  	"emailAddress": "lcbphilip@gmail.com",
@@ -66,11 +66,11 @@ var users = [
 var userStatuses = [
     [
      	"changbo",
-     	JSON.stringify(["1", "2"])
+     	JSON.stringify(["0"])
 	],
     [
   		"tahmids",
-  		JSON.stringify(["0"])
+  		JSON.stringify(["1", "2"])
 	]
 
 ]
@@ -91,7 +91,7 @@ var statusContents = [
 		  	             ]
 			})
      ],
-    ["1",
+    ["2",
 		JSON.stringify({
 		  	"content": "staring midterm now",
 		  	"creator": "tahmids",
@@ -99,15 +99,18 @@ var statusContents = [
 		  	"comments": [
 		  	             	{"commentor": "changbo",
 		  	             	 "commentContent": "gl"
-		  	            	 }
+		  	            	 },
+                       {"commentor": "tahmids",
+                       "commentContent": "ty" 
+                       }
 		  	             ]
 			})
 	],
-	["2",
+	["1",
 		JSON.stringify({
 		  	"content": "let's start final project...",
 		  	"creator": "tahmids",
-		  	"host": "changbo",
+		  	"host": "tahmids",
 		  	"comments": []
 			})
 	]           
