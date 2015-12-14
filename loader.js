@@ -13,11 +13,12 @@ var async = require('async');
 
 /* Here is our initial data. */
 
-var passwordDBname = "passwords"
+var passwordDBname = "passwords";
 var userDBname = "users";
 var userStatusDBname = "userStatuses";
 var statusContentDBname = "statusContents";
 var notificationDBname = "notifications";
+var latestDBname = "latests";
 
 var credential = require('credential');
 var pw = credential();
@@ -25,6 +26,8 @@ var pw = credential();
 
 // UserID will be between 8 and 15 (inclusive) in length, and only contain
 // lowercase alphabets or 0 to 9
+
+var latests = [["latest", "2"]]
 
 var passwords = [
               ["changbo", "xdsdfsdgadf341"],
@@ -183,6 +186,15 @@ var uploadNotifications = function(table, callback) {
 	}, callback);
 }
 
+var uploadLatests = function(table, callback) {
+  async.forEach(latests, function (latest, callback) {
+   console.log("Adding latest: " + latest[0]);
+   table.put(latest[0], latest[1], function(err, data) {
+     if (err)
+       console.log("Oops, error when adding "+ latest[0]+": " + err);
+   });
+  }, callback);
+}
 
 
 /* This function uploads our data. Notice the use of 'async.forEach'
@@ -350,9 +362,38 @@ function setupNotifications(err, data) {
     uploadNotifications(tableR, function(){
       console.log("Done uploading!")
     });
+    setTimeout(setupLatests,5000);
   }
 }
 
+var m = 0;
+function setupLatests(err, data) {
+  m++;
+  if (err && m != 2) {
+    console.log("Error: " + err); 
+  } else if (m==1) {
+    console.log("Deleting table "+ latestDBname +" if it already exists...");
+    params = {
+        "TableName": latestDBname
+    }
+    db.deleteTable(params, function(){
+      console.log("Waiting 10s for the table to be deleted...")
+      setTimeout(setupLatests,10000) // this may not be enough - increase if you're getting errors
+    })
+  } else if (m==2) {
+    console.log("Creating table "+latestDBname+"...");
+    tableR = new kvs(latestDBname)
+    tableR.init(setupLatests)
+  } else if (m==3) {
+    console.log("Waiting 10s for the table to become active...")
+    setTimeout(setupLatests,10000) // this may not be enough - increase if you're getting errors
+  } else if (m==4) {
+    console.log("Uploading")
+    uploadLatests(tableR, function(){
+      console.log("Done uploading!")
+    });
+  }
+}
 
 setupPasswords(null, null);
 

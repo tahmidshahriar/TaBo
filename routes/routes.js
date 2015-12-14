@@ -61,40 +61,9 @@ var home = function(req, res) {
 		res.redirect('/')
 	}
 
-	db.status(sess.user, function (data, err) {
-		current = data.translation;
-		db.profile(sess.user, function(data, err) {
-			if (err) {
-				res.render('home.ejs', {
-					message : err,
-					news: null,
-					footer : "TaBo",
-					user : sess.user
-
-				});
-				
-				
-			} else if (data == null) {
-				res.render('home.ejs', {
-					message : "No users",
-					news : null,
-					footer : "TaBo",
-						user : sess.user
-				});
-				
-				
-			} else {
-				console.log(current);
-				res.render('home.ejs', {
-					message : "",
-					news: current,
-					footer : "TaBo",
-					user : sess.user,
-					prof : data.translation
-				});	
-			}
-		})
-	})
+	else {
+		res.redirect('/profile/' + sess.user)
+	}
 };
 
 var homeOther = function(req, res) {
@@ -107,7 +76,6 @@ var homeOther = function(req, res) {
 		if (data == null) {
 			res.redirect("/");
 		} else {
-			console.log("HEREEE")
 			current = data.translation;
 			db.profile(req.params.user, function(data, err) {
 				if (err) {
@@ -122,7 +90,6 @@ var homeOther = function(req, res) {
 				} else if (data == null) {
 					res.redirect("/");
 				} else {
-					console.log(current);
 					res.render('home.ejs', {
 						message : "",
 						news: current,
@@ -168,8 +135,19 @@ var createaccount = function(req, res) {
 				}
 			}});
 	});
-	
+};
 
+var createstatus = function(req, res) {
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/restaurants')
+	}
+
+	var user = req.body.user;
+	var post = req.body.post;
+	db.addStatus(user, sess.user, post, function(data, err) {
+		res.redirect("/profile/" + user)	
+	});
 };
 
 var signout = function(req, res) {
@@ -189,7 +167,8 @@ var routes = {
 	post_createaccount : createaccount,
 	get_signout : signout,
 	get_home : home,
-	get_homeOther : homeOther
+	get_homeOther : homeOther,
+	post_createstatus : createstatus,
 };
 
 module.exports = routes;

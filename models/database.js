@@ -4,10 +4,12 @@ var kvsPassword
 var credential = require('credential');
 var pw = credential();
 
+kvsNotif = new keyvaluestore('notifications');
 kvsUser = new keyvaluestore('users');
 kvsPassword = new keyvaluestore('passwords');
 kvsStatus = new keyvaluestore('userStatuses');
 kvsStatusContent = new keyvaluestore('statusContents');
+kvsLatest = new keyvaluestore('latests');
 kvsUser.init(function(err, data) {
 	console.log("User table loaded")
 });
@@ -19,6 +21,12 @@ kvsStatus.init(function(err, data) {
 });
 kvsStatusContent.init(function(err, data) {
 	console.log("Status Content table loaded")
+});
+kvsLatest.init(function(err, data) {
+	console.log("Latest table loaded")
+});
+kvsNotif.init(function(err, data) {
+	console.log("Latest table loaded")
 });
 /*
  * The function below is an example of a database method. Whenever you need to
@@ -77,7 +85,6 @@ var myDB_signup_user = function(user, first, last, email, affiliation, interest,
 	};
 
 var myDB_signin = function(username, password, route_callbck) {
-	console.log('Looking up: ' + username);
 	kvsPassword.get(username, function(err, data) {
 		if (err) {
 			route_callbck(null, "Lookup error: " + err);
@@ -164,6 +171,186 @@ var myDB_profile = function(user, route_callbck) {
 	});
 };
 
+
+var myDB_addStatus = function(host, creator, post, route_callbck) {
+	kvsLatest.get("latest", function (err, data) {
+		if (data == null) {
+			kvsLatest.put("latest", "0", function(err, data) {
+				kvsStatusContent.put("1", JSON.stringify({
+					"content" : post, 
+				  	"creator" : creator,
+				  	"host": host,
+				  	"comments": []
+				}), function (err, data) {
+					kvsStatus.get(host, function (err, data) {
+						myVal = data[0]["value"]
+						myInx  = data[0]["inx"]
+						myVal.push("0")
+						kvsStatus.updateValue(host, myInx, myVal, function(err, data) {
+							if (host == creator) {
+								kvsUser.get(host, function (err, data) {
+									myVal = JSON.parse(data[0]["value"])
+									myInx = data[0]["inx"]
+									myVal["mostRecentUpdate"] = post
+									kvsUser.update(host, myInx, myInx, function(err, data) {
+										if (err) {
+											route_callbck(null, "Lookup error: " + err);
+										} else {
+											route_callbck(null, null);
+										}
+									})
+								})
+							} else {
+								if (err) {
+									route_callbck(null, "Lookup error: " + err);
+								} else {
+									route_callbck(null, null);
+								}
+							}
+						}) 
+					})
+				})
+			})
+		} else {
+			val = parseInt(data[0]["value"]) + 1
+			strVal = val.toString();
+			kvsLatest.updateValue("latest", data[0]["inx"], val, function(err, data) {
+				kvsStatusContent.put(strVal, JSON.stringify({
+					"content" : post, 
+				  	"creator" : creator,
+				  	"host": host,
+				  	"comments": []
+				}), function (err, data) {
+					kvsStatus.get(host, function (err, data) {
+						myVal = JSON.parse(data[0]["value"])
+						myInx  = data[0]["inx"]
+						myVal.push(strVal);
+						kvsStatus.updateValue(host, myInx, myVal, function(err, data) {
+								if (host == creator) {
+									kvsUser.get(host, function (err, data) {
+										myVal = JSON.parse(data[0]["value"])
+										myInx = data[0]["inx"]
+										myVal.mostRecentUpdate = post
+										kvsUser.update(host, myInx, myVal, function(err, data) {
+											if (err) {
+												route_callbck(null, "Lookup error: " + err);
+											} else {
+												route_callbck(null, null);
+											}
+										})
+									})
+								} else {
+									if (err) {
+										route_callbck(null, "Lookup error: " + err);
+									} else {
+										route_callbck(null, null);
+									}
+								}
+							}) 
+						}) 
+					})
+				})
+		}
+	})
+};
+
+
+// var myDB_addStatus = function(host, creator, post, route_callbck) {
+// 	kvsLatest.get("latest", function (err, data) {
+// 		if (data == null) {
+// 			kvsLatest.put("latest", "0", function(err, data) {
+// 				kvsStatusContent.put("1", JSON.stringify({
+// 					"content" : post, 
+// 				  	"creator" : creator,
+// 				  	"host": host,
+// 				  	"comments": []
+// 				}), function (err, data) {
+// 					kvsStatus.get(host, function (err, data) {
+// 						myVal = data[0]["value"]
+// 						myInx  = data[0]["inx"]
+// 						myVal.push("0")
+// 						kvsStatus.updateValue(host, myInx, myVal, function(err, data) {
+// 							if (host == creator) {
+// 								kvsUser.get(host, function (err, data) {
+// 									myVal = JSON.parse(data[0]["value"])
+// 									myInx = data[0]["inx"]
+// 									myVal["mostRecentUpdate"] = post
+// 									kvsUser.update(host, myInx, myInx, function(err, data) {
+// 										if (err) {
+// 											route_callbck(null, "Lookup error: " + err);
+// 										} else {
+// 											route_callbck(null, null);
+// 										}
+// 									})
+// 								})
+// 							} else {
+// 								kvsNotif.get(host, function (err, data) {
+// 									myVal = JSON.parse(data[0]["value"])
+// 									myInx = data[0]["inx"]
+// 									myVal.push(strVal)
+// 									kvsNotif.update(host, myVal, myInx, function (err,data) {
+// 										if (err) {
+// 											route_callbck(null, "Lookup error: " + err);
+// 										} else {
+// 											route_callbck(null, null);
+// 										}
+// 									})
+// 								})
+// 							}
+// 						}) 
+// 					})
+// 				})
+// 			})
+// 		} else {
+// 			val = parseInt(data[0]["value"]) + 1
+// 			strVal = val.toString();
+// 			kvsLatest.updateValue("latest", data[0]["inx"], val, function(err, data) {
+// 				kvsStatusContent.put(strVal, JSON.stringify({
+// 					"content" : post, 
+// 				  	"creator" : creator,
+// 				  	"host": host,
+// 				  	"comments": []
+// 				}), function (err, data) {
+// 					kvsStatus.get(host, function (err, data) {
+// 						myVal = JSON.parse(data[0]["value"])
+// 						myInx  = data[0]["inx"]
+// 						myVal.push(strVal);
+// 						kvsStatus.updateValue(host, myInx, myVal, function(err, data) {
+// 								if (host == creator) {
+// 									kvsUser.get(host, function (err, data) {
+// 										myVal = JSON.parse(data[0]["value"])
+// 										myInx = data[0]["inx"]
+// 										myVal.mostRecentUpdate = post
+// 										kvsUser.update(host, myInx, myVal, function(err, data) {
+// 											if (err) {
+// 												route_callbck(null, "Lookup error: " + err);
+// 											} else {
+// 												route_callbck(null, null);
+// 											}
+// 										})
+// 									})
+// 								} else {
+// 									kvsNotif.get(host, function (err, data) {
+// 										myVal = JSON.parse(data[0]["value"])
+// 										myInx = data[0]["inx"]
+// 										myVal.push(strVal)
+// 										kvsNotif.update(host, myVal, myInx, function (err,data) {
+// 											if (err) {
+// 												route_callbck(null, "Lookup error: " + err);
+// 											} else {
+// 												route_callbck(null, null);
+// 											}
+// 										})
+// 									})
+// 								}
+// 							}) 
+// 						}) 
+// 					})
+// 				})
+// 		}
+// 	})
+// };
+
 /*
  * We define an object with one field for each method. For instance, below we
  * have a 'lookup' field, which is set to the myDB_lookup function. In
@@ -177,7 +364,8 @@ var database = {
 	signupUser : myDB_signup_user,
 	home : myDB_home,
 	status : myDB_status,
-	profile : myDB_profile
+	profile : myDB_profile,
+	addStatus : myDB_addStatus
 };
 
 module.exports = database;

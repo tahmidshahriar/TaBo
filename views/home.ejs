@@ -8,7 +8,6 @@
 <div class="row padding-md">
 	<div class="col-xs-3 panel" style="outline:2px">
 		<div class="row text-center" style="background-color:#6699ff; color:white">  Profile Information </div>
-
 		<b> <u> Detail </u> </b> <br>
 		Name : <%= prof["firstName"] %>  <%= prof["lastName"] %>  <br>
 		Email : <%= prof["emailAddress"] %>  <br>
@@ -27,6 +26,21 @@
 	</div>
 	<div class="col-xs-6 panel">
 	<div class="row text-center" style="background-color:#6699ff; color:white">  News Feed </div>
+
+
+	<div class="panel row">
+	<br>
+    <form class="" action="/createstatus" method="post">
+	    <input type="hidden" type="text" value= <%= user %> name="user">
+		<div class="col-md-10"> 	<input style="width: 100%" type="text" placeholder="Post on Wall!" name= "post" required> </div>
+	    <div class="cold-md-2"> <button class="btn-large" type="submit">Post</button> </div>
+	    </ul>
+	</form>
+	</div>
+
+
+
+
 	<% for (var i=0; i < news.length; i++) { %>
 		<div class="panel">
 			<div class="row" style="color:#6699ff">

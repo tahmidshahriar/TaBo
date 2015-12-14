@@ -448,5 +448,39 @@
     })
   };
 
+  keyvaluestore.prototype.updateValue = function(keyword, inx, attributes, callback) {
+    var self = this;
+    if (self.inx === -1){
+      callback("Error using table - call init first!", null)
+      return
+    }
+    self.remove(keyword, inx, function(err, data){
+      if (err) {
+        callback(err, null);
+      } else {
+        var params = {
+            Item: {
+              "keyword": {
+                S: keyword
+              },
+              "inx": {
+                N: inx.toString()
+              },
+              value: { 
+                S: JSON.stringify(attributes)
+              }
+            },
+            TableName: self.tableName,
+            ReturnValues: 'NONE'
+        };
+
+        db.putItem(params, callback);
+      }
+    })
+  };
+
+
+
+
   module.exports = keyvaluestore;
 }());
