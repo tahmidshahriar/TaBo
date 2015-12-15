@@ -6,6 +6,7 @@
      "start": "node app.js"
    },
    "dependencies": {
+      "async" : "*",
       "credential" : "*",
       "express": "3.3.8",
       "aws-sdk": "*",

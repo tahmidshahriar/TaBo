@@ -25,6 +25,8 @@ app.get('/home', routes.get_home);
 app.get('/signout', routes.get_signout);
 app.get('/profile/:user', routes.get_homeOther);
 app.post('/createstatus', routes.post_createstatus);
+app.post('/createinterest', routes.post_createinterest);
+app.post('/createcomment', routes.post_createcomment);
 /* Run the server */
 
 app.listen(8080);

@@ -3,6 +3,7 @@ var kvsUser
 var kvsPassword
 var credential = require('credential');
 var pw = credential();
+async = require("async");
 
 kvsNotif = new keyvaluestore('notifications');
 kvsUser = new keyvaluestore('users');
@@ -72,14 +73,16 @@ var myDB_signup_user = function(user, first, last, email, affiliation, interest,
 				  	"interestList": [interest],
 				  	"birthday": birthday
 				}), function(err, data) {
-					if (err) {
-						route_callbck(null, "Put error: " + err);
-					} else {
-						route_callbck({
-							translation : "Created",
-							name: user
-						}, null);
-					}
+					kvsStatus.put(user, JSON.stringify([]), function (err, data) {
+						if (err) {
+							route_callbck(null, "Put error: " + err);
+						} else {
+							route_callbck({
+								translation : "Created",
+								name: user
+							}, null);
+						}
+					})
 				})
 			}
 	};
@@ -136,25 +139,26 @@ var myDB_status = function(user, route_callbck) {
 			a = JSON.parse(data[0]["value"]);
 			left = a.length;
 			add = []
-			for (var i = 0; i < a.length; i++ ) {
-				kvsStatusContent.get(a[i], function (err, data) {
-					add.push(JSON.parse(data[0]["value"]));
-					left = left - 1;
-					if (left == 0) {
-						if (err) {
-							route_callbck(null, "Lookup error: " + err);
-						} else if (data == null) {
-							route_callbck(null, null);
-						} else {
-							route_callbck({
-								translation : add
-							}, null);
-						} 
-					}
-				})
-			}
-		}
-	});
+			async.each(a,
+		  // 2nd param is the function that each item is passed to
+		  function(item, callback){
+		    // Call an asynchronous function, often a save() to DB
+				kvsStatusContent.get(item, function (err, data) {
+					temp = JSON.parse(data[0]["value"])
+					temp["key"] = item
+					add.push( temp );
+				  callback();
+		    });
+		  },
+		  // 3rd param is the function to call when everything's done
+		  function(err){
+		    // All tasks are done now
+				route_callbck({translation : add}, null);
+		  }
+		);
+	}
+})
+
 };
 
 var myDB_profile = function(user, route_callbck) {
@@ -192,7 +196,7 @@ var myDB_addStatus = function(host, creator, post, route_callbck) {
 									myVal = JSON.parse(data[0]["value"])
 									myInx = data[0]["inx"]
 									myVal["mostRecentUpdate"] = post
-									kvsUser.update(host, myInx, myInx, function(err, data) {
+									kvsUser.update(host, myInx, myVal, function(err, data) {
 										if (err) {
 											route_callbck(null, "Lookup error: " + err);
 										} else {
@@ -351,6 +355,43 @@ var myDB_addStatus = function(host, creator, post, route_callbck) {
 // 	})
 // };
 
+
+
+var myDB_addInterest = function(user, post, route_callbck) {
+	kvsUser.get(user, function (err, data) {
+		myVal = JSON.parse(data[0]["value"])
+		myInx = data[0]["inx"]
+		myVal.interestList.push(post)
+		console.log(myVal)
+		kvsUser.update(user, myInx, myVal, function(err, data) {
+			if (err) {
+				route_callbck(null, "Lookup error: " + err);
+			} else {
+				console.log(myVal);
+				route_callbck(null, null);
+			}
+		})
+	})
+};
+
+
+var myDB_addComment = function(statusId, user, post, route_callbck) {
+	kvsStatusContent.get(statusId, function (err, data) {
+		myVal = JSON.parse(data[0]["value"])
+		myInx = data[0]["inx"]
+		console.log(myVal)
+		myVal.comments.push({ "commentor" : user, "commentContent" : post})
+		kvsStatusContent.update(statusId, myInx, myVal, function(err, data) {
+			if (err) {
+				route_callbck(null, "Lookup error: " + err);
+			} else {
+				console.log(myVal);
+				route_callbck(null, null);
+			}
+		})
+	})
+};
+
 /*
  * We define an object with one field for each method. For instance, below we
  * have a 'lookup' field, which is set to the myDB_lookup function. In
@@ -365,7 +406,9 @@ var database = {
 	home : myDB_home,
 	status : myDB_status,
 	profile : myDB_profile,
-	addStatus : myDB_addStatus
+	addStatus : myDB_addStatus,
+	addInterest : myDB_addInterest,
+	addComment : myDB_addComment
 };
 
 module.exports = database;

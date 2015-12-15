@@ -2,29 +2,33 @@ var db = require('../models/database.js');
 var credential = require('credential');
 var pw = credential();
 var getMain = function(req, res) {
+	console.log("GETTING MAIN PAGE")
 	var sess = req.session
 	if ( (!sess.user  || sess.user == null) == false) {
 		res.redirect("/home");
 	}
-
-	res.render('main.ejs', {
-		message : "",
-		footer: "TaBo"
-	})
+	else {
+		res.render('main.ejs', {
+			message : "",
+			footer: "TaBo"
+		})
+	}
 };
 
 var signout = function(req, res) {
-	
+	console.log("SIGNING OUT")
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/home')
 	}
-	
-	sess.user = null
-	res.redirect('/')
+	else {
+		sess.user = null
+		res.redirect('/')
+	}
 };
 
 var checkLogin = function(req, res) {
+	console.log("LOGGING IN")
 	var user = req.body.user;
 	var pass = req.body.pass;
 	
@@ -56,6 +60,7 @@ var checkLogin = function(req, res) {
 
 
 var home = function(req, res) {
+	console.log("GOING TO PROFILE")
 	sess = req.session;
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/')
@@ -67,43 +72,56 @@ var home = function(req, res) {
 };
 
 var homeOther = function(req, res) {
+	console.log("GOING PROFILE OTHER")
+	console.log(req.params.user)
 	sess = req.session;
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/')
 	}
+	else {
+		db.status(req.params.user, function (data, err) {
+				if (data != null) {
+					current = data.translation;
+					current.sort(function(a,b){
+					    return (parseInt(a.key) - parseInt(b.key)) * -1;
+					    }
+					);
 
-	db.status(req.params.user, function (data, err) {
-		if (data == null) {
-			res.redirect("/");
-		} else {
-			current = data.translation;
-			db.profile(req.params.user, function(data, err) {
-				if (err) {
-					res.render('home.ejs', {
-						message : err,
-						news: null,
-						footer : "TaBo",
-						user : req.params.user
 
-					});
-					
-				} else if (data == null) {
-					res.redirect("/");
+
 				} else {
-					res.render('home.ejs', {
-						message : "",
-						news: current,
-						footer : "TaBo",
-						user : req.params.user,
-						prof : data.translation
-					});	
+					current = []
 				}
-			})
-		}
-	})
+				db.profile(req.params.user, function(data, err) {
+					if (err) {
+						res.render('home.ejs', {
+							message : err,
+							news: null,
+							footer : "TaBo",
+							user : req.params.user,
+							host : sess.user
+						});
+						
+					} else if (data == null) {
+						res.redirect("/signout");
+					} else {
+						res.render('home.ejs', {
+							message : "",
+							news: current,
+							footer : "TaBo",
+							user : req.params.user,
+							prof : data.translation,
+							host : sess.user
+						});	
+					}
+				})
+
+		})
+	}
 };
 
 var createaccount = function(req, res) {
+	console.log("CREATING ACCOUNT")
 	var user = req.body.user;
 	var pass = req.body.pass;
 	var first = req.body.first;
@@ -112,7 +130,6 @@ var createaccount = function(req, res) {
 	var affiliation = req.body.affiliation;
 	var interest = req.body.interest;
 	var birthday = req.body.birthday;
-
 	pw.hash(pass, function (err, hash) {
 		db.signupPassword(user, hash, function(data, err) {
 			if (err) {
@@ -150,8 +167,35 @@ var createstatus = function(req, res) {
 	});
 };
 
+var createinterest = function(req, res) {
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/restaurants')
+	}
+
+	var post = req.body.inter;
+	db.addInterest(sess.user, post, function(data, err) {
+		res.redirect("/profile/" + sess.user)	
+	});
+};
+
+var createcomment = function(req, res) {
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/restaurants')
+	}
+
+	var post = req.body.com;
+	var i = req.body.i;
+	var h = req.body.h;
+	db.addComment(i, sess.user, post, function(data, err) {
+		res.redirect("/profile/" + h)	
+	});
+};
+
+
 var signout = function(req, res) {
-	
+	console.log("SIGNING OUT")
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/restaurants')
@@ -169,6 +213,8 @@ var routes = {
 	get_home : home,
 	get_homeOther : homeOther,
 	post_createstatus : createstatus,
+	post_createinterest : createinterest,
+	post_createcomment : createcomment,
 };
 
 module.exports = routes;
