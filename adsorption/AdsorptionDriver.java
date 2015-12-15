@@ -17,7 +17,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-public class SocialRankDriver {
+public class AdsorptionDriver {
 
 	private static int doInitjob(String[] args) throws Exception {
 		// Create a configuration
@@ -25,7 +25,7 @@ public class SocialRankDriver {
 
 		// Create a job
 		Job initJob = new Job(conf, "init job");
-		initJob.setJarByClass(SocialRankDriver.class);
+		initJob.setJarByClass(AdsorptionDriver.class);
 
 		int numRed;
 		try {
@@ -68,7 +68,7 @@ public class SocialRankDriver {
 
 		// Create a job
 		Job iterJob = new Job(conf, "iter job");
-		iterJob.setJarByClass(SocialRankDriver.class);
+		iterJob.setJarByClass(AdsorptionDriver.class);
 
 		int numRed;
 		try {
@@ -113,7 +113,7 @@ public class SocialRankDriver {
 
 		// Create a job
 		Job diffJob = new Job(conf, "diff job");
-		diffJob.setJarByClass(SocialRankDriver.class);
+		diffJob.setJarByClass(AdsorptionDriver.class);
 
 		int numRed;
 		try {
@@ -153,7 +153,7 @@ public class SocialRankDriver {
 
 		// Create a job
 		Job diffJob2 = new Job(conf2, "diff job 2");
-		diffJob2.setJarByClass(SocialRankDriver.class);
+		diffJob2.setJarByClass(AdsorptionDriver.class);
 
 		// Set number of reducers
 		diffJob2.setNumReduceTasks(1);
@@ -194,7 +194,7 @@ public class SocialRankDriver {
 
 		// Create a job
 		Job finiJob = new Job(conf, "finish job");
-		finiJob.setJarByClass(SocialRankDriver.class);
+		finiJob.setJarByClass(AdsorptionDriver.class);
 
 		int numRed;
 		try {

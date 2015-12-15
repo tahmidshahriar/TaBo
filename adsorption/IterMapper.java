@@ -1,5 +1,3 @@
-package edu.upenn.nets212.hw3;
-
 import java.io.IOException;
 
 import org.apache.hadoop.io.LongWritable;

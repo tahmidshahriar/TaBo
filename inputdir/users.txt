@@ -1,0 +1,1 @@
+changbo	0	"{""confirmedFriends"":[""tahmids""],""pendingFriends"":[],""mostRecentUpdate"":""working on nets212"",""firstName"":""Changbo"",""lastName"":""Li"",""emailAddress"":""lcbphilip@gmail.com"",""affiliation"":""Penn"",""interestList"":[""cycling"",""singing""],""birthday"":""1992.10.12""}"
