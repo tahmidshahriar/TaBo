@@ -374,6 +374,71 @@ var myDB_addInterest = function(user, post, route_callbck) {
 	})
 };
 
+var myDB_addFriend = function(fr, sender, route_callbck) {
+	kvsUser.get(sender, function(err, data) {
+		myVal = JSON.parse(data[0]["value"])
+		myInx = data[0]["inx"]
+		if (myVal.pendingFriends.indexOf(fr) != -1) {
+			myVal.confirmedFriends.push(fr)
+			myVal.pendingFriends.splice(myVal.pendingFriends.indexOf(fr), 1)
+			kvsUser.update(sender, myInx, myVal, function(err, data) {
+				kvsUser.get(fr, function(err, data) {
+					myVal = JSON.parse(data[0]["value"])
+					myInx = data[0]["inx"]
+					myVal.confirmedFriends.push(sender)
+					kvsUser.update(fr, myInx, myVal, function(err, data) {
+						if (err) {
+							route_callbck(null, "Lookup error: " + err);
+						} else {
+							console.log(myVal);
+							route_callbck(null, null);
+						}
+					})
+				})
+			})
+		} else {
+			kvsUser.get(fr, function (err, data) {
+				myVal = JSON.parse(data[0]["value"])
+				myInx = data[0]["inx"]
+				myVal.pendingFriends.push(sender)
+				kvsUser.update(fr, myInx, myVal, function(err, data) {
+					if (err) {
+						route_callbck(null, "Lookup error: " + err);
+					} else {
+						console.log(myVal);
+						route_callbck(null, null);
+					}
+				})
+			})
+		}
+	})
+};
+
+
+var myDB_acceptFriend = function(fr, me, route_callbck) {
+	kvsUser.get(me, function (err, data) {
+		myVal = JSON.parse(data[0]["value"])
+		myInx = data[0]["inx"]
+		myVal.confirmedFriends.push(fr)
+		myVal.pendingFriends.splice(myVal.pendingFriends.indexOf(fr), 1)
+		kvsUser.update(me, myInx, myVal, function(err, data) {
+			kvsUser.get(fr, function(err, data) {
+				myVal = JSON.parse(data[0]["value"])
+				myInx = data[0]["inx"]
+				myVal.confirmedFriends.push(me)
+				kvsUser.update(fr, myInx, myVal, function(err, data) {
+					if (err) {
+						route_callbck(null, "Lookup error: " + err);
+					} else {
+						console.log(myVal);
+						route_callbck(null, null);
+					}
+				})
+			})
+		})
+	})
+};
+
 
 var myDB_addComment = function(statusId, user, post, route_callbck) {
 	kvsStatusContent.get(statusId, function (err, data) {
@@ -392,6 +457,35 @@ var myDB_addComment = function(statusId, user, post, route_callbck) {
 	})
 };
 
+
+// var myDB_newsFeed = function(me, route_callbck) {
+// 	kvsUser.get(me, function (err, data) {
+// 		myVal = JSON.parse(data[0]["value"])
+// 		add = []
+// 		a = myVal.confirmedFriends
+// 		async.each(a,
+// 		  // 2nd param is the function that each item is passed to
+// 		  function(item, callback){
+// 		    // Call an asynchronous function, often a save() to DB
+// 				kvsStatusContent.get(item, function (err, data) {
+// 					temp = JSON.parse(data[0]["value"])
+// 					temp["key"] = item
+// 					add.push( temp );
+// 				  callback();
+// 		    });
+// 		  },
+// 		  // 3rd param is the function to call when everything's done
+// 		  function(err){
+// 		    // All tasks are done now
+// 				route_callbck({translation : add}, null);
+// 		  }
+// 		);		
+
+
+// 	})
+// };
+
+
 /*
  * We define an object with one field for each method. For instance, below we
  * have a 'lookup' field, which is set to the myDB_lookup function. In
@@ -408,7 +502,9 @@ var database = {
 	profile : myDB_profile,
 	addStatus : myDB_addStatus,
 	addInterest : myDB_addInterest,
-	addComment : myDB_addComment
+	addComment : myDB_addComment,
+	addFriend : myDB_addFriend,
+	acceptFriend : myDB_acceptFriend
 };
 
 module.exports = database;

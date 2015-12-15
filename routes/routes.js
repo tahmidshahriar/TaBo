@@ -72,8 +72,6 @@ var home = function(req, res) {
 };
 
 var homeOther = function(req, res) {
-	console.log("GOING PROFILE OTHER")
-	console.log(req.params.user)
 	sess = req.session;
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/')
@@ -86,33 +84,50 @@ var homeOther = function(req, res) {
 					    return (parseInt(a.key) - parseInt(b.key)) * -1;
 					    }
 					);
-
-
-
 				} else {
 					current = []
 				}
 				db.profile(req.params.user, function(data, err) {
-					if (err) {
-						res.render('home.ejs', {
-							message : err,
-							news: null,
-							footer : "TaBo",
-							user : req.params.user,
-							host : sess.user
-						});
-						
-					} else if (data == null) {
+					if (data == null) {
 						res.redirect("/signout");
 					} else {
-						res.render('home.ejs', {
-							message : "",
-							news: current,
-							footer : "TaBo",
-							user : req.params.user,
-							prof : data.translation,
-							host : sess.user
-						});	
+						if (((data.translation["confirmedFriends"]).indexOf(sess.user)) != -1 || sess.user == req.params.user) {
+								res.render('home.ejs', {
+								message : "",
+								news: current,
+								footer : "TaBo",
+								user : req.params.user,
+								prof : data.translation,
+								host : sess.user,
+								friends : "yes",
+								added : "yes"
+							});	
+						} else {
+							if (((data.translation["pendingFriends"]).indexOf(sess.user)) != -1) {
+								res.render('home.ejs', {
+									message : "",
+									news: current,
+									footer : "TaBo",
+									user : req.params.user,
+									prof : data.translation,
+									host : sess.user,
+									friends : "no",
+									added: "yes"
+								});
+							} else {
+									res.render('home.ejs', {
+									message : "",
+									news: current,
+									footer : "TaBo",
+									user : req.params.user,
+									prof : data.translation,
+									host : sess.user,
+									friends : "no",
+									added: "no"
+								});
+							}	
+						}
+
 					}
 				})
 
@@ -157,7 +172,7 @@ var createaccount = function(req, res) {
 var createstatus = function(req, res) {
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
-		res.redirect('/restaurants')
+		res.redirect('/home')
 	}
 
 	var user = req.body.user;
@@ -182,7 +197,7 @@ var createinterest = function(req, res) {
 var createcomment = function(req, res) {
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
-		res.redirect('/restaurants')
+		res.redirect('/home')
 	}
 
 	var post = req.body.com;
@@ -193,17 +208,53 @@ var createcomment = function(req, res) {
 	});
 };
 
+var addfriend = function(req, res) {
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/home')
+	}
+	console.log(req.body)
+	var friend = req.body.fr;
+	db.addFriend(friend, sess.user, function(data, err) {
+		res.redirect("/profile/" + friend)	
+	});
+};
+
+var acceptfriend = function(req, res) {
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/home')
+	}
+	console.log(req.body)
+	var friend = req.body.fr;
+	db.addFriend(friend, sess.user, function(data, err) {
+		res.redirect("/profile/" + sess.user)	
+	});
+};
+
 
 var signout = function(req, res) {
 	console.log("SIGNING OUT")
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
-		res.redirect('/restaurants')
+		res.redirect('/home')
 	}
 	
 	sess.user = null
 	res.redirect('/')
 };
+
+// var createcomment = function(req, res) {
+// 	var sess = req.session
+// 	if (!sess.user  || sess.user == null) {
+// 		res.redirect('/home')
+// 	}
+
+// 	db.getNewsFeed(sess.user, function(data, err) {
+// 		res.redirect("/profile/" + h)	
+// 	});
+// };
+
 
 var routes = {
 	get_main : getMain,
@@ -215,6 +266,8 @@ var routes = {
 	post_createstatus : createstatus,
 	post_createinterest : createinterest,
 	post_createcomment : createcomment,
+	post_addfriend : addfriend,
+	post_acceptfriend : acceptfriend,
 };
 
 module.exports = routes;
