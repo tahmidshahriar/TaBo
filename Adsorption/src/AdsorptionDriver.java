@@ -296,7 +296,7 @@ public class AdsorptionDriver {
 		    diffArgs[4] = numRed;
 			
 			double diff = Double.POSITIVE_INFINITY;
-			double threshold = 30.0;
+			double threshold = 0.01;
 			
 			while (diff > threshold) {
 				exitcode = doIterjob(iterArgs_1);
