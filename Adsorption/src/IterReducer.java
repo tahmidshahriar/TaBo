@@ -1,38 +1,68 @@
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import org.apache.commons.lang3.StringUtils;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+
+/*
+ * IterReducer
+	Input: 
+	u#tahmids	[“0.25#changbo”,“~u#changbo;i#drinking;a#penn“]
+i#cycling	[“0.25#changbo”,“~u#changbo“]
+i#singing	[“0.25#changbo”,“~u#changbo“]
+a#penn	[“0.25#changbo”,”0.33#tahmids”, “~u#changbo;u#tahmids”]
+u#changbo	[“0.33#tahmids”, “~u#tahmids;i#cycling;i#singing;a#penn”]
+i#drinking	[“0.33#tahmids”, “~u#tahmids”]
+
+Output:    (for each key; add together the weights from each user) (trivial in this particular example)
+(for each vertex; need to build a HashMap to sum weights associated with each user)
+u#tahmids	0.25#changbo~u#changbo;i#drinking;a#penn
+i#cycling	0.25#changbo~u#changbo
+i#singing	0.25#changbo~u#changbo
+a#penn	0.25#changbo;0.33#tahmids~u#changbo;u#tahmids
+u#changbo	0.33#tahmids~u#tahmids;i#cycling;i#singing;a#penn
+i#drinking	0.33#tahmids~u#tahmids
+ */
 
 class IterReducer extends Reducer<Text, Text, Text, Text> {
 
 	public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
-
-		String targets = "";
-		double rank = 0.0;
+		
+		String adjacency = "";
+		HashMap<String, Double> summedWeights = new HashMap<String, Double>();
+		LinkedList<String> outLabels = new LinkedList<String>();
 
 		for (Text v : values) {
 			String s = v.toString();
-			String[] ss = s.split(" ");
-			if (ss.length > 1) {
-				// if the K-V pair was emitted by the same ID,
-				// collect the rank and also the list of targets
-				double weight = Double.parseDouble(ss[0]);
-				rank = rank + weight;
-				targets = ss[1];
-			} else {
-				// for other K-V pairs, just collect the ranks
-				double weight = Double.parseDouble(ss[0]);
-				rank = rank + weight;
+			if (s.charAt(0) == '~') {
+				adjacency = adjacency + s;
+			}
+			else {
+				String[] frags = s.split("#");
+				double w = Double.parseDouble(frags[0]);
+				String label = frags[1];
+				if (summedWeights.containsKey(label)) {
+					double oldWeight = summedWeights.get(label);
+					summedWeights.put(label, (oldWeight + w));
+				}
+				else {
+					summedWeights.put(label, w);
+				}
+				
 			}
 		}
-
-		String rankString = Double.toString(rank);
-
-		String outputString = rankString + " " + targets;
-
-		Text outputV = new Text(outputString);
-
-		context.write(key, outputV);
+		
+		for (String l: summedWeights.keySet()) {
+			outLabels.add(
+					Double.toString(summedWeights.get(l))  + "#" + l);
+		}
+		
+		String outV = StringUtils.join(outLabels, ";") + adjacency;
+		
+		context.write(key, new Text(outV));
 	}
 }

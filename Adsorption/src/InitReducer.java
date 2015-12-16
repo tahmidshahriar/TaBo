@@ -35,7 +35,6 @@ a#penn	~u#changbo;u#tahmids
 		String k = key.toString();
 		String[] ks = k.split("#");
 		
-		
 		boolean isUser = ks[0].equals("u");
 		
 		if (isUser) {

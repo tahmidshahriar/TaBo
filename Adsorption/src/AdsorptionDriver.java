@@ -210,11 +210,8 @@ public class AdsorptionDriver {
 		// Set final and intermediate output key and value classes
 		finiJob.setOutputKeyClass(Text.class);
 		finiJob.setOutputValueClass(Text.class);
-		finiJob.setMapOutputKeyClass(DoubleWritable.class);
+		finiJob.setMapOutputKeyClass(Text.class);
 		finiJob.setMapOutputValueClass(Text.class);
-
-		// Set sorting for the keys
-		finiJob.setSortComparatorClass(DoubleWritable.Comparator.class);
 		
 		// Set input and output format classes
 		finiJob.setInputFormatClass(TextInputFormat.class);
@@ -251,6 +248,8 @@ public class AdsorptionDriver {
 		// check difference between two rounds of results from the command line
 		else if (args[0].equals("diff") && args.length == 5) {
 			double result = doDiffjob(args);
+			System.out.println("Difference is: " + Double.toString(result));
+			System.exit(0);
 		}
 
 		// finish the job from the command line
