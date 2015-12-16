@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head> 
+	<link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row padding-md">
+			<div class="col-xs-2 panel" style="outline:2px">
+				<div class="row text-center" style="background-color:#6699ff; color:white">  Profile Information </div>
+				<div class="row">
+					<b> <u> Detail </u> </b> <br>
+
+					<a href="/getnews">GET NEWS</a>
+					
+					Name : <%= prof["firstName"] %>  <%= prof["lastName"] %>  <br>
+					Email : <%= prof["emailAddress"] %>  <br>
+					Affiliation : <%= prof["affiliation"] %>  <br>
+					Birthday : <%= prof["birthday"] %>  <br>
+					<br>
+				</div>
+
+				<div class="row text-center" style="background-color:#6699ff; color:white">  Interests </div>
+				<div class="row">
+					<b> <u> Interests </u> </b> <br>
+					<% for(var j=0; j < prof["interestList"].length; j++) { %>
+					<%= prof["interestList"][j] %>  <br>
+					<% } %>
+
+					<% if (user == host) { %>
+					<form class="" action="/createinterest" method="post">
+						<div class="col-md-8" style="padding:0"> 	<input class="pull-left" style="width: 80%" type="text" placeholder="Add Interest!" name= "inter" required> </div>
+						<div class="cold-md-2"> <button class="btn-large" type="submit">Add</button> </div>
+					</form>
+					<% } %>
+					<br>
+				</div>
+
+				<div class="row">
+					<div class="row text-center" style="background-color:#6699ff; color:white">  Status </div>
+
+					<b> <u> Status </u> </b> <br>
+					<%= prof["mostRecentUpdate"] %>  
+					<br>
+					<a href="/signout" class="button"> Signout </a>    
+				</div>
+			</div>
+			<div class="col-xs-1"> </div>
+
+
+
+
+
+
+
+			<div class="col-xs-6 panel">
+				<div class="row text-center" style="background-color:#6699ff; color:white">  Wall </div>
+
+				<% if (friends == "yes") { %>
+				<div class="panel row">
+					<br>
+					<form class="" action="/createstatus" method="post">
+						<input type="hidden" type="text" value= <%= user %> name="user">
+						<div class="col-md-10"> 	<input style="width: 100%" type="text" placeholder="Post on Wall!" name= "post" required> </div>
+						<div class="cold-md-2"> <button class="btn-large" type="submit">Post</button> </div>
+					</form>
+				</div>
+				<% } %>
+
+
+
+
+
+				<% for (var i=0; i < news.length; i++) { %>
+				<div class="panel">
+					<div class="row" style="color:#6699ff">
+						<b> <%= news[i]["creator"] %> </b> : <%= news[i]["content"] %> 
+						<br>
+					</div>
+					<div class="row">
+						<% for(var j=0; j < news[i]["comments"].length; j++) { %>
+						<%= news[i]["comments"][j]["commentor"]%> : <%= news[i]["comments"][j]["commentContent"] %>
+						<br>
+						<% } %>
+					</div>
+
+					<% if (friends == "yes") { %>
+					<div class="panel row" style="padding: 0">
+						<br>
+						<form class="" action="/createcomment" method="post">
+							<input type="hidden" type="text" value= <%= news[i]["key"] %> name="i">
+							<input type="hidden" type="text" value= <%= user %> name="h">
+							<div class="col-md-10"> 	<input style="width: 100%" type="text" placeholder="Comment" name= "com" required> </div>
+							<div class="cold-md-2"> <button class="btn-large" type="submit">Post </button> </div>
+						</form>
+					</div>
+					<% } %>
+				
+				</div>
+				<% } %>
+
+			</div>
+			<div class="col-xs-3 panel">
+				<div class="row text-center" style="background-color:#6699ff; color:white">  Friends </div>
+				
+
+				<% if (user == host) {%>
+				<b> <u> Pending: </u> </b>
+				<br>
+				<% for(var i=0; i < prof["pendingFriends"].length; i++) { %>
+				<a href="/profile/<%= prof["pendingFriends"][i]%>"> <%= prof["pendingFriends"][i]%> </a>
+					<form class="" action="/acceptfriend" method="post">	
+						<input type="hidden" type="text" value= <%= prof["pendingFriends"][i] %> name="fr">
+						<div class="cold-md-2"> <button class="btn-large" type="submit">Add Friend </button> </div>
+					</form>
+
+
+
+
+
+
+				<br>
+				<% } %>
+				<% if (prof["pendingFriends"].length == 0) { %>
+				No Pending Request <br><br>
+				<% } %>
+				<% } %>
+
+				<% if (added == "no") { %>
+					<form class="" action="/addfriend" method="post">	
+						<input type="hidden" type="text" value= <%= user %> name="fr">
+						<div class="cold-md-2"> <button class="btn-large" type="submit">Add Friend </button> </div>
+					</form>
+				<% } %>
+
+
+				<b> <u> Accepted: </u> </b>
+				<br>
+				<% for(var i=0; i < prof["confirmedFriends"].length; i++) { %>
+				<a href="/profile/<%= prof["confirmedFriends"][i]%>"> <%= prof["confirmedFriends"][i]%> </a>
+				<br>
+				<% } %>
+
+
+			</div>
+		</div> 
+
+
+	</div>
+
+</body>
+</html>
+
+
