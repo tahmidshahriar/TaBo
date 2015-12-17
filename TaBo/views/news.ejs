@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head> 
+	<link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row padding-md">
+
+
+			<a href="/signout" class="button"> Signout </a>    
+			<a href="/profile/<%= host %>" class="button"> Profile </a>    
+
+			<div class="col-xs-12 panel">
+				<div class="row text-center" style="background-color:#6699ff; color:white">  News Feed </div>
+
+				<% for (var i=0; i < news.length; i++) { %>
+				<div class="panel">
+					<div class="row" style="color:#6699ff">
+						<b> <%= news[i]["creator"] %> </b> : <%= news[i]["content"] %> 
+						<br>
+					</div>
+					<div class="row">
+						<% for(var j=0; j < news[i]["comments"].length; j++) { %>
+						<%= news[i]["comments"][j]["commentor"]%> : <%= news[i]["comments"][j]["commentContent"] %>
+						<br>
+						<% } %>
+					</div>
+
+					<% if (friends == "yes") { %>
+					<div class="panel row" style="padding: 0">
+						<br>
+						<form class="" action="/createcomment/news" method="post">
+							<input type="hidden" type="text" value= <%= news[i]["key"] %> name="i">
+							<input type="hidden" type="text" value= <%= user %> name="h">
+							<div class="col-md-10"> 	<input style="width: 100%" type="text" placeholder="Comment" name= "com" required> </div>
+							<div class="cold-md-2"> <button class="btn-large" type="submit">Post </button> </div>
+						</form>
+					</div>
+					<% } %>
+				
+				</div>
+				<% } %>
+
+			</div>
+
+		</div> 
+
+
+	</div>
+
+</body>
+</html>
+
+
