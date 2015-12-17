@@ -6,6 +6,15 @@ lcbphilip	tahmids~changbo~lcbphilip~test~test2
 tahmids	tahmids~lcbphilip~changbo~test~test2
 test	tahmids~changbo~lcbphilip~test~test2
 test2	tahmids~changbo~lcbphilip~test~test2
+
+
+Sample uploaded content to the table:
+Key:
+changbo
+
+Value: 
+{"0":"tahmids","1":"changbo","2":"lcbphilip","3":"test","4":"test2"}
+
  */
 
 var AWS = require('aws-sdk');

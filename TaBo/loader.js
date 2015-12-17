@@ -19,6 +19,7 @@ var userStatusDBname = "userStatuses";
 var statusContentDBname = "statusContents";
 var notificationDBname = "notifications";
 var latestDBname = "latests";
+var onlineOfflineDBname = "onlineOffline";
 
 var credential = require('credential');
 var pw = credential();
@@ -126,6 +127,11 @@ var notifications = [
 		["tahmids", JSON.stringify(["0"])]
 ]
 
+var onlineOffline = [
+                 ["changbo", "offline"],
+                 ["tahmids", "offline"]
+                    ]
+
 
 /* This function uploads our data. Notice the use of 'async.forEach'
 to do something for each element of an array... */
@@ -196,6 +202,15 @@ var uploadLatests = function(table, callback) {
   }, callback);
 }
 
+var uploadOnlineOffline = function(table, callback) {
+	async.forEach(onlines, function (online, callback) {
+	 console.log("Adding user online/offline status: " + online[0]);
+	 table.put(online[0], online[1], function(err, data) {
+	   if (err)
+	     console.log("Oops, error when adding "+online[0]+": " + err);
+	 });
+	}, callback);
+	}
 
 /* This function uploads our data. Notice the use of 'async.forEach'
    to do something for each element of an array... */
@@ -390,6 +405,35 @@ function setupLatests(err, data) {
   } else if (m==4) {
     console.log("Uploading")
     uploadLatests(tableR, function(){
+      console.log("Done uploading!")
+    });
+  }
+}
+
+var n = 0;
+function setupOnlineOffline(err, data) {
+  n++;
+  if (err && n != 2) {
+    console.log("Error: " + err); 
+  } else if (n==1) {
+    console.log("Deleting table "+ onlineOfflineDBname +" if it already exists...");
+    params = {
+        "TableName": onlineOfflineDBname
+    }
+    db.deleteTable(params, function(){
+      console.log("Waiting 10s for the table to be deleted...")
+      setTimeout(setupOnlineOffline,10000) // this may not be enough - increase if you're getting errors
+    })
+  } else if (n==2) {
+    console.log("Creating table "+onlineOfflineDBname+"...");
+    tableR = new kvs(onlineOfflineDBname)
+    tableR.init(setupOnlineOffline)
+  } else if (n==3) {
+    console.log("Waiting 10s for the table to become active...")
+    setTimeout(setupOnlineOffline,10000) // this may not be enough - increase if you're getting errors
+  } else if (n==4) {
+    console.log("Uploading")
+    uploadOnlineOffline(tableR, function(){
       console.log("Done uploading!")
     });
   }
