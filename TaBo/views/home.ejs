@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
+
+<title> <%= user %> </title>
+
 <head> 
 	<link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.css">
 </head>
 <body>
 	<div class="container-fluid">
 		<div class="row padding-md">
-			<div class="col-xs-2 panel" style="outline:2px">
+			<div class="col-xs-2 panel" style="outline:2px; padding: 2%;">
 				<div class="row text-center" style="background-color:#6699ff; color:white">  Profile Information </div>
 				<div class="row">
 					<b> <u> Detail </u> </b> <br>
@@ -39,11 +42,15 @@
 
 					<b> <u> Status </u> </b> <br>
 					<%= prof["mostRecentUpdate"] %>  
-					<br>
-					<a href="/signout" class="button"> Signout </a>    
+					<br>  
+				</div>
+				<br>
+				<div class="row">
+					<div class="row text-center" style="background-color:#6699ff; color:white">  Navigate </div>
+					<a href="/home" class="button"> <b> News Feed </b> </a> <br>
+					<a href="/signout" class="button"> <b> Signout </b> </a>    
 				</div>
 			</div>
-			<div class="col-xs-1"> </div>
 
 
 
@@ -51,7 +58,7 @@
 
 
 
-			<div class="col-xs-6 panel">
+			<div class="col-xs-6 panel" style="padding:2%">
 				<div class="row text-center" style="background-color:#6699ff; color:white">  Wall </div>
 
 				<% if (friends == "yes") { %>
@@ -72,12 +79,12 @@
 				<% for (var i=0; i < news.length; i++) { %>
 				<div class="panel">
 					<div class="row" style="color:#6699ff">
-						<b> <%= news[i]["creator"] %> </b> : <%= news[i]["content"] %> 
+						<a href="/profile/<%= news[i]["creator"] %>">  <b> <%= news[i]["creator"] %> </b> </a>: <%= news[i]["content"] %> 
 						<br>
 					</div>
 					<div class="row">
 						<% for(var j=0; j < news[i]["comments"].length; j++) { %>
-						<%= news[i]["comments"][j]["commentor"]%> : <%= news[i]["comments"][j]["commentContent"] %>
+						<a href="/profile/<%= news[i]["comments"][j]["commentor"]%>"> <%= news[i]["comments"][j]["commentor"]%> </a>: <%= news[i]["comments"][j]["commentContent"] %>
 						<br>
 						<% } %>
 					</div>
@@ -98,7 +105,7 @@
 				<% } %>
 
 			</div>
-			<div class="col-xs-3 panel">
+			<div class="col-xs-4 panel" style="padding: 2%">
 				<div class="row text-center" style="background-color:#6699ff; color:white">  Friends </div>
 				
 

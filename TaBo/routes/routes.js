@@ -1,9 +1,7 @@
 var db = require('../models/database.js');
 var credential = require('credential');
 var pw = credential();
-<<<<<<< HEAD
 var wl = require('../whitelister.js');
-=======
 
 
 // strict white listing for username so that it can only contain 
@@ -46,7 +44,6 @@ var general_wl = function(stringToCheck, callback) {
 		return false
 	}
 };
->>>>>>> 4f0ed9aa9251a6d4de6d32e35adebc4abb30801e
 
 var getMain = function(req, res) {
 	console.log("GETTING MAIN PAGE")
