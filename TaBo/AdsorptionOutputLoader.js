@@ -1,7 +1,12 @@
-/* This is a simple example of a program that creates the database and puts some 
-   initial data into it. You don't strictly need this (you can always edit the
-   database using the DynamoDB console), but it may be convenient, e.g., when you
-   need to reset your application to its initial state during testing. */
+/*
+ *
+Sample output to be uploaded & reformatted
+changbo	tahmids~changbo~lcbphilip~test~test2
+lcbphilip	tahmids~changbo~lcbphilip~test~test2
+tahmids	tahmids~lcbphilip~changbo~test~test2
+test	tahmids~changbo~lcbphilip~test~test2
+test2	tahmids~changbo~lcbphilip~test~test2
+ */
 
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./config.json');
@@ -17,35 +22,46 @@ var friendRecDBname = "friendRec";
 
 
 var fs = require('fs');
-var LineArray = fs.readFileSync('./AWSAdsorptionExchange/test.txt').toString().split("\n");
+var LineArray = fs.readFileSync('./AWSAdsorptionExchange/part-r-00000').toString().split("\n");
+var output = [];
 for(i in LineArray) {
     console.log(LineArray[i]);
 }
 
-// notification tracks the most recent status updates from a user's friends
-
-var notifications = [
-		["changbo", JSON.stringify(["1"])],
-		["tahmids", JSON.stringify(["0"])]
-]
-
-
 /* This function uploads our data. Notice the use of 'async.forEach'
 to do something for each element of an array... */
 
-var uploadLatests = function(table, callback) {
-  async.forEach(latests, function (latest, callback) {
-   console.log("Adding latest: " + latest[0]);
-   table.put(latest[0], latest[1], function(err, data) {
-     if (err)
-       console.log("Oops, error when adding "+ latest[0]+": " + err);
-   });
+var uploadFriendRec = function(table, callback) {
+  async.forEach(LineArray, function (line, callback) {
+	  
+	  var kv = line.split('\t');
+	  
+	  if (kv.length == 2) {
+		  var userKey = kv[0];
+		  var vs = kv[1].split('~');
+		  if (vs.length > 0) {
+			  if (vs[0].length > 0) {
+				  
+			  var outV = {};
+			  for (var i = 0; i < vs.length; i++) {
+				  outV[i] = vs[i];
+			  }
+			  var outVString = JSON.stringify(outV);
+			  
+				  
+			   console.log("Adding friend recommendations for: " + userKey 
+					   + " and that is: " + outVString);
+			   
+			   table.put(userKey, outVString, function(err, data) {
+			     if (err)
+			       console.log("Oops, error when adding "+ userKey +": " + err);
+			   });
+			  }
+		  }
+	  }
+	  
   }, callback);
 }
-
-
-/* This function uploads our data. Notice the use of 'async.forEach'
-   to do something for each element of an array... */
 
 
 
@@ -62,36 +78,33 @@ var uploadLatests = function(table, callback) {
    is actually executed when we start the program. */   
 
 var h = 0;
-function setupPasswords(err, data) {
+function setupFriendRec(err, data) {
   h++;
   if (err && h != 2) {
     console.log("Error: " + err); 
   } else if (h==1) {
-    console.log("Deleting table " + passwordDBname+" if it already exists...");
+    console.log("Deleting table " + friendRecDBname +" if it already exists...");
     params = {
-        "TableName": passwordDBname
+        "TableName": friendRecDBname
     }
     db.deleteTable(params, function(){
-      console.log("Waiting 10s for the table to be deleted...")
-      setTimeout(setupPasswords,10000) // this may not be enough - increase if you're getting errors
+      console.log("Waiting 10s for the table to be deleted...");
+      setTimeout(setupFriendRec,10000); // this may not be enough - increase if you're getting errors
     })
   } else if (h==2) {
-    console.log("Creating table "+ passwordDBname +"...");
-    table = new kvs(passwordDBname)
-    table.init(setupPasswords)
+    console.log("Creating table "+ friendRecDBname +"...");
+    table = new kvs(friendRecDBname);
+    table.init(setupFriendRec);
   } else if (h==3) {
-    console.log("Waiting 10s for the table to become active...")
-    setTimeout(setupPasswords,10000) // this may not be enough - increase if you're getting errors
+    console.log("Waiting 10s for the table to become active...");
+    setTimeout(setupFriendRec,10000) // this may not be enough - increase if you're getting errors
   } else if (h==4) {
     console.log("Uploading")
-    uploadPasswords(table, function(){
+    uploadFriendRec(table, function(){
       console.log("Done uploading!")
     });
-    setTimeout(setupUsers,5000);
   }
 }
 
 
-//setupPasswords(null, null);
-
-
+setupFriendRec(null, null);

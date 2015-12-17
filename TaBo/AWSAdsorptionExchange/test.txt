@@ -1,5 +1,0 @@
-test2	~Penn~Penn;
-test    tahmids;~Penn~Testing;
-changbo tahmids;~Penn~cycling;singing;
-tahmids changbo;test;~Penn~drinking;partying;
-lcbphilip	~Penn~Singing;Swimming;Cycling;
