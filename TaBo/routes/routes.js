@@ -373,12 +373,12 @@ var searchSuggest = function(req, res) {
 		
 		var doCheck = false;
 		while (true) {
-			// wait until the update is complete
+			// wait until the checking is complete
 			if (err) {
 				res.send(err, null);
 				break;
 			}
-			else {
+			else if (err == null){
 				doCheck = true;
 				break;				
 			}
@@ -390,7 +390,7 @@ var searchSuggest = function(req, res) {
 		db.getSuggestions(searchTerm, function route_callbck(info, err) {
 				
 			while (true) {
-				// wait until the update is complete
+				// wait until the suggestion pulling is complete
 				if (err) {
 					res.send(err, null);
 					break;
