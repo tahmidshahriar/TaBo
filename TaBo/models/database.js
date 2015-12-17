@@ -1,6 +1,7 @@
 var keyvaluestore = require('../models/keyvaluestore.js');
 var kvsUser;
 var kvsPassword;
+var kvsFriendRec;
 var credential = require('credential');
 var pw = credential();
 async = require("async");
@@ -11,6 +12,8 @@ kvsPassword = new keyvaluestore('passwords');
 kvsStatus = new keyvaluestore('userStatuses');
 kvsStatusContent = new keyvaluestore('statusContents');
 kvsLatest = new keyvaluestore('latests');
+kvsFriendRec =  new keyvaluestore('friendRec');
+
 kvsUser.init(function(err, data) {
 	console.log("User table loaded")
 });
@@ -21,14 +24,18 @@ kvsStatus.init(function(err, data) {
 	console.log("Status table loaded")
 });
 kvsStatusContent.init(function(err, data) {
-	console.log("Status Content table loaded")
+	console.log("StatusContent table loaded")
 });
 kvsLatest.init(function(err, data) {
 	console.log("Latest table loaded")
 });
 kvsNotif.init(function(err, data) {
-	console.log("Latest table loaded")
+	console.log("Notif table loaded")
 });
+kvsFriendRec.init(function(err, data) {
+	console.log("FriendRec table loaded")
+});
+
 /*
  * The function below is an example of a database method. Whenever you need to
  * access your database, you should define a function (myDB_addUser,
@@ -541,6 +548,22 @@ var myDB_getUserInfo = function(uName, route_callbck) {
 	});
 };
 
+var myDB_getSuggestions = function(uName, route_callbck) {
+
+	console.log('Finding information about the user: ' + uName);
+	kvsFriendRec.get(uName, function(err, data) {
+		if (err) {
+			route_callbck(null, "Finding user info error: " + err);
+		} else if (data == null) {
+			route_callbck(null, null);
+		} else if (data.length == 0) {
+			route_callbck(null, null);
+		} else {
+			route_callbck(data, null);
+		}
+	});
+};
+
 /*
  * We define an object with one field for each method. For instance, below we
  * have a 'lookup' field, which is set to the myDB_lookup function. In
@@ -562,9 +585,9 @@ var database = {
 	acceptFriend : myDB_acceptFriend,
 	newsFeed : myDB_newsFeed,
 	getAllUsernames: myDB_getAllUsernames,
-	getUserInfo: myDB_getUserInfo
+	getUserInfo: myDB_getUserInfo,
 	
-	// getSuggestions: myDB_getSuggestions
+	getSuggestions: myDB_getSuggestions
 };
 
 module.exports = database;

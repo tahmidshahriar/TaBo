@@ -369,24 +369,19 @@ var news = function(req, res) {
 
 var searchSuggest = function(req, res) {
 	
-	var searchInfo = req.params.input;
+	// res has two parts: err & data
+	var searchTerm = req.params.input;
 	
-	
-	
-	var resKey = searchInfo.key;
-	var resInx = searchInfo.inx;
-
-	
-	db.delReview(resKey, resInx, function route_callbck(info, err) {
+	db.getSuggestions(searchTerm, function route_callbck(info, err) {
 				
 			while (true) {
 				// wait until the update is complete
 				if (err) {
-					res.send(err);
+					res.send(err, null);
 					break;
 				}
-				else if (info === true) {
-					res.send(null);
+				else if (info) {
+					res.send(null, info);
 					break;				
 				}
 			}

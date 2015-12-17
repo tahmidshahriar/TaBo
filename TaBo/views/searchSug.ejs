@@ -16,8 +16,10 @@
             }
             
             var htmlOut = (l)+ " suggestion(s):<p><table border=\"1\">\n";
-            for (var i=0; i<l; i++)
-            htmlOut += "<tr><td>#"+(1+i)+"</td><td>"+elements[i]+"</td></tr>\n";
+            for (var i = 0; i < l; i++) {
+                htmlOut += "<tr><td>#"+(1+i)+"</td><td>"+elements[i]+"</td></tr>\n";
+            }
+            
             htmlOut += "</table>\n";
             $("#suggestedFriend").html(htmlOut);
         }
@@ -34,7 +36,6 @@
     <input type="submit" value="Replace">
     </form>
     <div id="suggestedFriend"> </div>
-    
     
   </body>
 </html>
