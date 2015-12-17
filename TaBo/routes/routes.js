@@ -339,7 +339,7 @@ var signout = function(req, res) {
 var news = function(req, res) {
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
-		res.redirect('/home')
+		res.redirect('/')
 	}
 	else {
 		console.log(sess.user)

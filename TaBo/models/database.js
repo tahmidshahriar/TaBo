@@ -501,6 +501,7 @@ var myDB_newsFeed = function(user, route_callbck) {
 		}
 		else {
 			a = (JSON.parse(data[0]["value"])).confirmedFriends;
+			a.push(user)
 			add = []
 			async.each(a,
 		  // 2nd param is the function that each item is passed to
