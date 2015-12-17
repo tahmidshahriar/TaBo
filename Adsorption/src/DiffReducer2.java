@@ -12,7 +12,8 @@ Reducer<Text, Text , Text, Text> {
 	public void reduce(Text key, Iterable<Text> values,
 			Context context) throws IOException, InterruptedException {
 		
-		// Build a collection of the changes in ranks between two iterations
+		// Build a collection of the changes in weights between two iterations
+		// across different vertices
 		LinkedList<Double> diffs = new LinkedList<Double>();
 		for (Text v: values) {
 			String vS = v.toString();

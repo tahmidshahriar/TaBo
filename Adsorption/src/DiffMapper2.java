@@ -17,7 +17,7 @@ Mapper<LongWritable, Text , Text, Text> {
 		String difference = vKV[1];
 		
 		// emit the change in label calculated in the first diff MapReduce
-		// for each vertex
+		// for each vertex (trivially passing through the value, converting to the same key)
 		context.write(new Text("placeholder"), new Text(difference));
 	}
 }

@@ -25,6 +25,8 @@ class FiniReducer extends Reducer<Text, Text, Text, Text> {
 			throws IOException, InterruptedException {
 		
 		Comparator<Double> descending = new Comparator<Double>() {
+			
+			// customized comparator that sorts doubles in descending order 
 			public int compare(Double d1, Double d2) {
 				if (d1 > d2) {
 					return -1;
@@ -36,6 +38,7 @@ class FiniReducer extends Reducer<Text, Text, Text, Text> {
 			}
 		};
 		
+		// take advantage of TreeMap's built-in key sorting
 		TreeMap<Double, LinkedList<String>> descMap = 
 				new TreeMap<Double, LinkedList<String>>(descending);
 		
@@ -50,6 +53,8 @@ class FiniReducer extends Reducer<Text, Text, Text, Text> {
 			String[] sFrags = s.split("~");
 			String username = sFrags[1].split("#")[1];
 			double weight = Double.parseDouble(sFrags[0]);
+			
+			// keep a list of friends for each weight to take care of possible ties
 			if (descMap.containsKey(weight)) {
 				descMap.get(weight).add(username);
 			}
@@ -62,6 +67,8 @@ class FiniReducer extends Reducer<Text, Text, Text, Text> {
 		
 		String outV = "";
 		
+		// iterate through the keySet of the TreeMap and make a list showing
+		// the friends in descending order of recommendability
 		for (double w: descMap.keySet()) {
 			LinkedList<String> uList = descMap.get(w);
 			for (String u: uList) {
@@ -70,6 +77,7 @@ class FiniReducer extends Reducer<Text, Text, Text, Text> {
 		}
 		String outputV = outV.substring(0, outV.length()-1);
 		
+		// output a list of friends for each user
 		context.write(key, new Text(outputV));
 		
 	}

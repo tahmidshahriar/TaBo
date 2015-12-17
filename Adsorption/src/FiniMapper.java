@@ -26,6 +26,8 @@ class FiniMapper extends Mapper<LongWritable, Text, Text, Text> {
 		String vString = value.toString();
 		String[] vKV = vString.split("\t");
 		String location = vKV[0];
+		
+		// only take care of vertices that represent users
 		if (location.charAt(0) == 'u') {
 			String[] vFrags = vKV[1].split("~");
 			if (vFrags.length == 2) {
@@ -37,6 +39,8 @@ class FiniMapper extends Mapper<LongWritable, Text, Text, Text> {
 					
 					String outV = weight + "~" + location;
 					
+					// for each weight label, emit label as key
+					// and vertex with the label (and the weight) as value 
 					context.write(new Text(label), new Text(outV));
 				}
 			}

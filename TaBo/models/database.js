@@ -585,6 +585,7 @@ var myDB_getUserInfo = function(uName, route_callbck) {
 	});
 };
 
+
 var myDB_getSuggestions = function(uName, route_callbck) {
 
 	console.log('Finding information about the user: ' + uName);

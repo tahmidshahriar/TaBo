@@ -4,8 +4,6 @@ var db = require('./models/database.js');
 
 var async = require('async');
 
-/* Here is our initial data. */
-
 var inputInfo = [];
 
 // UserID will be between 8 and 15 (inclusive) in length, and only contain
@@ -103,7 +101,7 @@ db.getAllUsernames(function(data, err) {
 							fileString = fileString + '\n';
 						}
 
-
+						// write to file
 						var fs = require('fs');
 						fs.writeFile("test.txt", fileString, function(err) {
 						    if(err) {
@@ -119,11 +117,10 @@ db.getAllUsernames(function(data, err) {
 			});	
 		}
 
-		
-		
 	} 
 });
 
 }
 
+// start the program
 setTimeout(getInputInfo,10000);

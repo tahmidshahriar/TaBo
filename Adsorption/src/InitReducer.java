@@ -37,18 +37,17 @@ a#penn	~u#changbo;u#tahmids;
 		
 		boolean isUser = ks[0].equals("u");
 		
+		// only assign initial weights to user vertices
 		if (isUser) {
 			for (Text v : values) {
 				String s = v.toString();
 				String[] frags = s.split("~");
 				
-				//String joined = StringUtils.join(frags, ";");
-				
 				String joined = "";
 				for (String f: frags) {
 					joined = joined + f + ";";
 				}
-				
+				// also emit the adjacency list
 				String outV = "1#" + ks[1] + "~" + joined; 
 				context.write(key, new Text(outV));
 			}
@@ -59,13 +58,13 @@ a#penn	~u#changbo;u#tahmids;
 			for (Text v : values) {
 				names.add(v.toString());
 			}
-			//String joined = StringUtils.join(names, ";");
 			
 			String joined = "";
 			for (String n: names) {
 				joined = joined + n + ";";
 			}
 			
+			// emit the adjacency list
 			String outV = "~" + joined; 
 			context.write(key, new Text(outV));
 		}

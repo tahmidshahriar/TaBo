@@ -1,7 +1,12 @@
-Full name:  _____Changbo Li_________
-SEAS login: ______changbo________
+Full name:  _____Changbo Li_& Tahmid Shariar______
+SEAS login: ______changbo & tahmids________
 
-Command line arguments:
+Command line arguments to run the entire adsorption process:
 hadoop jar TaBoAdsorption.jar AdsorptionDriver composite inputdir outputdir intermdir1 intermdir2 diffdir 1
 
+The input text file has to be manually moved from the source location into
+the folder /inputdir
 
+Output text file is in /outputdir and needs to be manually copied into
+
+TaBo/AWSAdsorption

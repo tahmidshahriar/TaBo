@@ -55,6 +55,8 @@ Mapper<LongWritable, Text , Text, Text> {
 				
 				String[] frags = w.split("#");
 				double oldWeight = Double.parseDouble(frags[0]);
+				
+				// evenly assign weights to out edges
 				double newWeight = oldWeight / numTargets;
 				String outputWeight = 
 						Double.toString(newWeight) + "#" + frags[1];
@@ -67,7 +69,5 @@ Mapper<LongWritable, Text , Text, Text> {
 	    
 	    // emit one K-V pair to pass the adjacency list
 		context.write(new Text(k), new Text("~" + splitted[1])); 
-
-		
 	}
 }

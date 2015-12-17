@@ -70,4 +70,5 @@ var whitelister = {
 		strict_wl: my_strict_wl,
 		general_wl: my_general_wl
 }
+
 module.exports = whitelister;

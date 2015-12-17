@@ -177,7 +177,7 @@ public class AdsorptionDriver {
 		deleteDirectory(args[3]);
 		FileOutputFormat.setOutputPath(diffJob2, new Path(args[3]));
 		
-		// run the job
+		// run the job part 2
 		int exitcode2 = diffJob2.waitForCompletion(true) ? 0 : 1;
 		System.out.println("Diff job done by Changbo Li (changbo)");
 		
@@ -193,14 +193,10 @@ public class AdsorptionDriver {
 		// Create a job
 		Job finiJob = new Job(conf, "finish job");
 		finiJob.setJarByClass(AdsorptionDriver.class);
-
-		int numRed;
-		try {
-			numRed = Integer.parseInt(args[3]);
-		} catch (Exception e) {
-			numRed = 1;
-		}
 		
+		// hardcoding: only one output file allowed
+		int numRed = 1;
+
 		finiJob.setNumReduceTasks(numRed);
 
 		// Set Mapper and Reducer classes
@@ -239,7 +235,7 @@ public class AdsorptionDriver {
 			System.exit(exitcode);
 		}
 
-		// run one iteration of rank computation from the command line
+		// run one iteration of weight computation from the command line
 		else if (args[0].equals("iter") && args.length == 4) {
 			int exitcode = doIterjob(args);
 			System.exit(exitcode);
@@ -295,10 +291,15 @@ public class AdsorptionDriver {
 		    diffArgs[3] = diffDir;
 		    diffArgs[4] = numRed;
 			
+		    // set the condition for convergence
 			double diff = Double.POSITIVE_INFINITY;
 			double threshold = 0.01;
 			
 			int iterCount = 0;
+			
+			// the iterCount sets a hard limit on number of iterations
+			// to take care of certain edge cases when convergence never happens
+			// or takes too long to happen
 			while (diff > threshold && iterCount < 10) {
 				exitcode = doIterjob(iterArgs_1);
 				exitcode = doIterjob(iterArgs_2);
