@@ -10,8 +10,6 @@
 				<div class="row text-center" style="background-color:#6699ff; color:white">  Profile Information </div>
 				<div class="row">
 					<b> <u> Detail </u> </b> <br>
-
-					<a href="/getnews">GET NEWS</a>
 					
 					Name : <%= prof["firstName"] %>  <%= prof["lastName"] %>  <br>
 					Email : <%= prof["emailAddress"] %>  <br>
@@ -137,9 +135,24 @@
 				<b> <u> Accepted: </u> </b>
 				<br>
 				<% for(var i=0; i < prof["confirmedFriends"].length; i++) { %>
-				<a href="/profile/<%= prof["confirmedFriends"][i]%>"> <%= prof["confirmedFriends"][i]%> </a>
+				
+
+					<a href="/profile/<%= prof["confirmedFriends"][i]%>"> <%= prof["confirmedFriends"][i]%> </a>
+
+
 				<br>
 				<% } %>
+
+				<br>
+				<b> <u> Affiliated: </u> </b>
+				<br>
+				<% for(var i=0; i < aff.length; i++) { %>
+				<% if (host != aff[i]) { %> 
+				<a href="/profile/<%= aff[i]%>"> <%= aff[i]%> </a>
+				<br>
+				<% } %>
+				<% } %>
+
 
 
 			</div>

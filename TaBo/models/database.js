@@ -450,6 +450,41 @@ var myDB_addComment = function(statusId, user, post, route_callbck) {
 	})
 };
 
+var myDB_affiliation = function(aff, route_callbck) {
+	kvsUser.scanKeys(function(err, data) {
+		if (data == null) {
+			route_callbck(null, null);
+		}
+		else {
+			
+			a = []
+			for (var i = 0; i < data.length; i++) {
+				a.push(data[i]["key"])
+			}
+
+			add = []
+			async.each(a,
+		  // 2nd param is the function that each item is passed to
+		  function(item, callback){
+		    // Call an asynchronous function, often a save() to DB
+				kvsUser.get(item, function (err, data) {
+					temp = (JSON.parse(data[0]["value"])).affiliation
+					if (temp == aff) {
+						add.push( item );
+					}
+				  callback();
+		    });
+		  },
+		  // 3rd param is the function to call when everything's done
+		  function(err){
+		    // All tasks are done now
+		    console.log(add)
+			route_callbck({translation : add}, null);
+		  }
+		);
+	}
+})
+};
 
 
 var myDB_newsFeed = function(user, route_callbck) {
@@ -522,7 +557,8 @@ var database = {
 	addComment : myDB_addComment,
 	addFriend : myDB_addFriend,
 	acceptFriend : myDB_acceptFriend,
-	newsFeed : myDB_newsFeed
+	newsFeed : myDB_newsFeed,
+	affiliation : myDB_affiliation
 };
 
 module.exports = database;
