@@ -1,6 +1,6 @@
 var keyvaluestore = require('../models/keyvaluestore.js');
-var kvsUser
-var kvsPassword
+var kvsUser;
+var kvsPassword;
 var credential = require('credential');
 var pw = credential();
 async = require("async");
@@ -502,6 +502,44 @@ function helper (add, route_callbck) {
 
 } 
 
+//return the list of all usernames as an array of {key: xxx, inx: yyy} dictionaries
+var myDB_getAllUsernames = function(route_callbck) {
+	console.log('Pulling all user names');
+
+	kvsUser.scanKeys(function(err, data) {
+		
+		// the callback function has two fields (data, error)
+		if (err) {
+			console.log("Oops, error when pulling usernames");
+			route_callbck(null, err);
+		}
+		else {
+			console.log("Here is the data: " + data);
+			route_callbck(data, null);
+		}
+
+	});
+};
+
+//given a username, return an array [name, data]
+//where the data is an array of {inx: xxx, value: yyy} dictionaries
+//the yyy part is a stringified JSON representation of the information 
+
+var myDB_getUserInfo = function(uName, route_callbck) {
+
+	console.log('Finding information about the user: ' + uName);
+	kvsUser.get(uName, function(err, data) {
+		if (err) {
+			route_callbck(null, "Finding user info error: " + err);
+		} else if (data == null) {
+			route_callbck(null, null);
+		} else if (data.length == 0) {
+			route_callbck(null, null);
+		} else {
+			route_callbck([uName, data], null);
+		}
+	});
+};
 
 /*
  * We define an object with one field for each method. For instance, below we
@@ -522,7 +560,11 @@ var database = {
 	addComment : myDB_addComment,
 	addFriend : myDB_addFriend,
 	acceptFriend : myDB_acceptFriend,
-	newsFeed : myDB_newsFeed
+	newsFeed : myDB_newsFeed,
+	getAllUsernames: myDB_getAllUsernames,
+	getUserInfo: myDB_getUserInfo
+	
+	// getSuggestions: myDB_getSuggestions
 };
 
 module.exports = database;

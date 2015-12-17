@@ -1,6 +1,8 @@
 var db = require('../models/database.js');
 var credential = require('credential');
 var pw = credential();
+var wl = require('../whitelister.js');
+
 var getMain = function(req, res) {
 	console.log("GETTING MAIN PAGE")
 	var sess = req.session
@@ -276,6 +278,33 @@ var news = function(req, res) {
 };
 
 
+var searchSuggest = function(req, res) {
+	
+	var searchInfo = req.params.input;
+	
+	
+	
+	var resKey = searchInfo.key;
+	var resInx = searchInfo.inx;
+
+	
+	db.delReview(resKey, resInx, function route_callbck(info, err) {
+				
+			while (true) {
+				// wait until the update is complete
+				if (err) {
+					res.send(err);
+					break;
+				}
+				else if (info === true) {
+					res.send(null);
+					break;				
+				}
+			}
+		});		
+	};
+
+
 var routes = {
 	get_main : getMain,
 	post_login : checkLogin,
@@ -290,6 +319,7 @@ var routes = {
 	post_addfriend : addfriend,
 	post_acceptfriend : acceptfriend,
 	get_newsfeed : news,
+	search_suggest: searchSuggest
 };
 
 module.exports = routes;

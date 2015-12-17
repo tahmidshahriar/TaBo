@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Search Suggestion</title></head>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript">
+  <!--
+    function updateSug() {
+    var term = document.getElementById('searchBox').value;
+    $.getJSON('http://localhost:8080/suggest/'+escape(term), function(err, resJSONString) {
+        
+        var elements = JSON.parse(resJSONString);
+        if (err == null) {
+            var l = elements.length;
+            if (l > 5) {
+                l = 5;
+            }
+            
+            var htmlOut = (l)+ " suggestion(s):<p><table border=\"1\">\n";
+            for (var i=0; i<l; i++)
+            htmlOut += "<tr><td>#"+(1+i)+"</td><td>"+elements[i]+"</td></tr>\n";
+            htmlOut += "</table>\n";
+            $("#suggestedFriend").html(htmlOut);
+        }
+    });
+    } // -->
+    
+    
+  </script>
+  <body>
+  
+    <h1>Input a search term</h1>
+    <form action="" method="" onSubmit="return false">
+    <input type="text" name="thetext" size="20" id="searchBox" onKeyUp="updateSug()">
+    <input type="submit" value="Replace">
+    </form>
+    <div id="suggestedFriend"> </div>
+    
+    
+  </body>
+</html>
