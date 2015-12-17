@@ -1,7 +1,52 @@
 var db = require('../models/database.js');
 var credential = require('credential');
 var pw = credential();
+<<<<<<< HEAD
 var wl = require('../whitelister.js');
+=======
+
+
+// strict white listing for username so that it can only contain 
+// lowercase letters and numbers (to avoid clashing of usernames etc.)
+// Also, length is controlled to be at most 15 (inclusive) so that the database 
+// will not be slowed down too much
+// the callback function returns one value only: either error message OR null
+
+var strict_wl = function(stringToCheck) {
+	
+	var allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+	if (stringToCheck.length > 15 || stringToCheck.length < 1) {
+		return true
+	}
+	else {
+		    for(var index = 0; index < stringToCheck.length; index++){
+		        if(allowedChars.indexOf(stringToCheck[index]) < 0){
+		            return true
+		        }
+		    }
+	    }
+	    return false
+};
+
+var general_wl = function(stringToCheck, callback) {
+	
+	var allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz" + 
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,";
+	
+	if (stringToCheck.length > 140 || stringToCheck.length < 1) {
+		return true
+	}
+	else {
+	
+		    for(var i = 0; i < stringToCheck.length; i++){
+		        if(allowedChars.indexOf(stringToCheck[i]) <0){
+		            return true
+		        }
+		    }
+		return false
+	}
+};
+>>>>>>> 4f0ed9aa9251a6d4de6d32e35adebc4abb30801e
 
 var getMain = function(req, res) {
 	console.log("GETTING MAIN PAGE")
@@ -30,35 +75,39 @@ var signout = function(req, res) {
 };
 
 var checkLogin = function(req, res) {
-
 	console.log("LOGGING IN")
 	var user = req.body.user;
 	var pass = req.body.pass;
+	if (general_wl(user) || general_wl(pass))  {
+	  res.send("Invalid Post - Please go back");
+	}
 	
-	db.signin(user, pass, function(data, err) {
-		if (err) {
-			res.render('main.ejs', {
-				message : err,
-				footer : "TaBo"
-			});
-		} else if (data) {
-			var sess = req.session
-			sess.user = data.name
-			if (data.translation == "Logged In") {
-				res.redirect('/home');
+	else {
+		db.signin(user, pass, function(data, err) {
+			if (err) {
+				res.render('main.ejs', {
+					message : err,
+					footer : "TaBo"
+				});
+			} else if (data) {
+				var sess = req.session
+				sess.user = data.name
+				if (data.translation == "Logged In") {
+					res.redirect('/home');
+				} else {
+					res.render('main.ejs', {
+						message : data.translation,
+						footer : "TaBo"
+					});
+				}
 			} else {
 				res.render('main.ejs', {
-					message : data.translation,
+					message : "Username Invalid",
 					footer : "TaBo"
 				});
 			}
-		} else {
-			res.render('main.ejs', {
-				message : "Username Invalid",
-				footer : "TaBo"
-			});
-		}
-	});
+		});
+	}
 };
 
 
@@ -83,43 +132,49 @@ var homeOther = function(req, res) {
 					if (data == null) {
 						res.redirect("/signout");
 					} else {
-						if (((data.translation["confirmedFriends"]).indexOf(sess.user)) != -1 || sess.user == req.params.user) {
-								res.render('home.ejs', {
-								message : "",
-								news: current,
-								footer : "TaBo",
-								user : req.params.user,
-								prof : data.translation,
-								host : sess.user,
-								friends : "yes",
-								added : "yes"
-							});	
-						} else {
-							if (((data.translation["pendingFriends"]).indexOf(sess.user)) != -1) {
-								res.render('home.ejs', {
-									message : "",
-									news: current,
-									footer : "TaBo",
-									user : req.params.user,
-									prof : data.translation,
-									host : sess.user,
-									friends : "no",
-									added: "yes"
-								});
-							} else {
+						v = data.translation
+						db.affiliation(data.translation["affiliation"], function(data, err) {
+							if (((v["confirmedFriends"]).indexOf(sess.user)) != -1 || sess.user == req.params.user) {
 									res.render('home.ejs', {
 									message : "",
 									news: current,
 									footer : "TaBo",
 									user : req.params.user,
-									prof : data.translation,
+									prof : v,
 									host : sess.user,
-									friends : "no",
-									added: "no"
-								});
-							}	
-						}
+									friends : "yes",
+									added : "yes",
+									aff : data.translation
+								});	
+							} else {
+								if (((v["pendingFriends"]).indexOf(sess.user)) != -1) {
+									res.render('home.ejs', {
+										message : "",
+										news: current,
+										footer : "TaBo",
+										user : req.params.user,
+										prof : v,
+										host : sess.user,
+										friends : "no",
+										added: "yes",
+										aff : data.translation
+									});
+								} else {
+										res.render('home.ejs', {
+										message : "",
+										news: current,
+										footer : "TaBo",
+										user : req.params.user,
+										prof : v,
+										host : sess.user,
+										friends : "no",
+										added: "no",
+										aff : data.translation
+									});
+								}	
+							}
 
+						})
 					}
 				})
 
@@ -137,28 +192,41 @@ var createaccount = function(req, res) {
 	var affiliation = req.body.affiliation;
 	var interest = req.body.interest;
 	var birthday = req.body.birthday;
-	pw.hash(pass, function (err, hash) {
-		db.signupPassword(user, hash, function(data, err) {
-			if (err) {
-				res.render('main.ejs', {
-					message : err,
-					footer : "TaBo"
-				});
-			} else if (data) {
-				if (data.translation == "Created") {
-					var sess = req.session
-					sess.user = data.name
-					db.signupUser(user, first, last, email, affiliation, interest, birthday, function(data, err) {
-						res.redirect('/home');
-					})
-				} else {
+	if (strict_wl(user)) {
+		res.render('main.ejs', {
+			message : "Username Illegal",
+			footer: "TaBo"
+		})
+	}
+	
+	else if (general_wl(pass) || general_wl(first) || general_wl(last) || general_wl(email) || general_wl(affiliation) || general_wl(interest)) {
+	  res.send("Invalid Post - Please go back");
+	}
+
+	else {
+		pw.hash(pass, function (err, hash) {
+			db.signupPassword(user, hash, function(data, err) {
+				if (err) {
 					res.render('main.ejs', {
-						message : data.translation,
+						message : err,
 						footer : "TaBo"
 					});
-				}
-			}});
-	});
+				} else if (data) {
+					if (data.translation == "Created") {
+						var sess = req.session
+						sess.user = data.name
+						db.signupUser(user, first, last, email, affiliation, interest, birthday, function(data, err) {
+							res.redirect('/home');
+						})
+					} else {
+						res.render('main.ejs', {
+							message : data.translation,
+							footer : "TaBo"
+						});
+					}
+				}});
+		});
+	}
 };
 
 var createstatus = function(req, res) {
@@ -169,9 +237,14 @@ var createstatus = function(req, res) {
 
 	var user = req.body.user;
 	var post = req.body.post;
-	db.addStatus(user, sess.user, post, function(data, err) {
-		res.redirect("/profile/" + user)	
-	});
+	if (general_wl(post)) {
+	  res.send("Invalid Post - Please go back");
+	}
+	else {
+		db.addStatus(user, sess.user, post, function(data, err) {
+			res.redirect("/profile/" + user)	
+		});
+	}	
 };
 
 var createinterest = function(req, res) {
@@ -180,10 +253,16 @@ var createinterest = function(req, res) {
 		res.redirect('/restaurants')
 	}
 
+
 	var post = req.body.inter;
-	db.addInterest(sess.user, post, function(data, err) {
-		res.redirect("/profile/" + sess.user)	
-	});
+	if (general_wl(post)) {
+	  res.send("Invalid Post - Please go back");
+	}
+	else {
+		db.addInterest(sess.user, post, function(data, err) {
+			res.redirect("/profile/" + sess.user)	
+		});
+	}	
 };
 
 var createcomment = function(req, res) {
@@ -193,11 +272,16 @@ var createcomment = function(req, res) {
 	}
 
 	var post = req.body.com;
-	var i = req.body.i;
-	var h = req.body.h;
-	db.addComment(i, sess.user, post, function(data, err) {
-		res.redirect("/profile/" + h)	
-	});
+	if (general_wl(post)) {
+	  res.send("Invalid Post - Please go back");
+	}
+	else {
+		var i = req.body.i;
+		var h = req.body.h;
+		db.addComment(i, sess.user, post, function(data, err) {
+			res.redirect("/profile/" + h)	
+		});
+	}
 };
 
 var createcommentNews = function(req, res) {
@@ -207,11 +291,16 @@ var createcommentNews = function(req, res) {
 	}
 
 	var post = req.body.com;
-	var i = req.body.i;
-	var h = req.body.h;
-	db.addComment(i, sess.user, post, function(data, err) {
-		res.redirect("/home")	
-	});
+	if (general_wl(post)) {
+	  res.send("Invalid Post - Please go back");
+	}
+	else {
+		var i = req.body.i;
+		var h = req.body.h;
+		db.addComment(i, sess.user, post, function(data, err) {
+			res.redirect("/home")	
+		});
+	}
 };
 
 var addfriend = function(req, res) {

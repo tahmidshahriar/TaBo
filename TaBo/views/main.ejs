@@ -9,9 +9,6 @@
  <div class="row" style="background-color: #6699ff; color: white; ">
  <div class="col-xs-6 loginbox">
   <h4>Welcome to TaBo</h4>
-    <%if (message != null) { %>
-  <font color="red"> <p> <%= message %></p> </font>
-  <% } %>   
  </div>
  <div class="col-xs-6 pull-right centered">
  <form class="pull-right border" action="/checklogin" method="post">
@@ -25,6 +22,7 @@
 <div class="row">
   <div class="col-xs-3">
     <br><br><br>
+    <b style="color:red"> <%= message %> </b>
     <form action="/createaccount" method="post">
     <ul>
     <li> <input style="width: 100%" type="text" placeholder="Username" name="user" required> </li>
