@@ -25,7 +25,7 @@ var credential = require('credential');
 var pw = credential();
 
 
-// UserID will be between 8 and 15 (inclusive) in length, and only contain
+// UserID will be at most 15 (inclusive) in length, and only contain
 // lowercase alphabets or 0 to 9
 
 var latests = [["latest", "2"]]
