@@ -11,9 +11,12 @@ Input:
 changbo	[“0.25~u#tahmids”,”0.5~u#bianca”]
 tahmids	[“0.33~u#changbo”]
 
-Output:
-changbo	bianca~tahmids
-tahmids	changbo
+Sample Output:
+changbo	tahmids~changbo~lcbphilip~test~test2
+lcbphilip	tahmids~changbo~lcbphilip~test~test2
+tahmids	tahmids~lcbphilip~changbo~test~test2
+test	tahmids~changbo~lcbphilip~test~test2
+test2	tahmids~changbo~lcbphilip~test~test2
  */
 
 class FiniReducer extends Reducer<Text, Text, Text, Text> {
