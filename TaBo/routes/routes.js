@@ -208,6 +208,20 @@ var createcomment = function(req, res) {
 	});
 };
 
+var createcommentNews = function(req, res) {
+	var sess = req.session
+	if (!sess.user  || sess.user == null) {
+		res.redirect('/home')
+	}
+
+	var post = req.body.com;
+	var i = req.body.i;
+	var h = req.body.h;
+	db.addComment(i, sess.user, post, function(data, err) {
+		res.redirect("/home")	
+	});
+};
+
 var addfriend = function(req, res) {
 	var sess = req.session
 	if (!sess.user  || sess.user == null) {
@@ -249,10 +263,25 @@ var news = function(req, res) {
 	if (!sess.user  || sess.user == null) {
 		res.redirect('/home')
 	}
+	else {
+		db.newsFeed(sess.user, function(data, err) {
+				
+				current = data.translation;
+				current.sort(function(a,b){
+				    return (parseInt(a.key) - parseInt(b.key)) * -1;
+				    }
+				);
 
-	db.newsFeed(sess.user, function(data, err) {
-		res.redirect("/")	
-	});
+				res.render('news.ejs', {
+				message : "",
+				news: current,
+				footer : "TaBo",
+				user : req.params.user,
+				friends : "yes",
+				host: sess.user
+			});
+		});
+	}
 };
 
 
@@ -261,11 +290,12 @@ var routes = {
 	post_login : checkLogin,
 	post_createaccount : createaccount,
 	get_signout : signout,
-	get_home : home,
+	get_home : news,
 	get_homeOther : homeOther,
 	post_createstatus : createstatus,
 	post_createinterest : createinterest,
 	post_createcomment : createcomment,
+	post_createcommentNews : createcommentNews,
 	post_addfriend : addfriend,
 	post_acceptfriend : acceptfriend,
 	get_newsfeed : news,

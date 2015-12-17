@@ -458,32 +458,57 @@ var myDB_addComment = function(statusId, user, post, route_callbck) {
 };
 
 
-var myDB_newsFeed = function(me, route_callbck) {
-	kvsUser.get(me, function (err, data) {
-		myVal = JSON.parse(data[0]["value"])
-		add = []
-		statusNumber = []
-		// All my friends
-		a = myVal.confirmedFriends
-		// For all friends, get all status
-		async.each(a,
+
+var myDB_newsFeed = function(user, route_callbck) {
+	kvsUser.get(user, function(err, data) {
+		if (data == null) {
+			route_callbck(null, null);
+		}
+		else {
+			a = (JSON.parse(data[0]["value"])).confirmedFriends;
+			add = []
+			async.each(a,
 		  // 2nd param is the function that each item is passed to
 		  function(item, callback){
-		    	// Call an asynchronous function, often a save() to DB
-		    	kvsStatus.get(item, function(err, data) {
-		    		statusNumber.concat(JSON.parse(data[0]["value"]))
-		    		callback()
-		    	})
+		    // Call an asynchronous function, often a save() to DB
+				kvsStatus.get(item, function (err, data) {
+					temp = JSON.parse(data[0]["value"])
+					add = add.concat( temp );
+				  callback();
 		    });
 		  },
 		  // 3rd param is the function to call when everything's done
 		  function(err){
-		  	console.log(statusNumber)
-			route_callbck(null, null);
 		    // All tasks are done now
+		    	helper(add, route_callbck)
 		  }
-		);		
+		);
 	}
+})
+};
+
+function helper (add, route_callbck) {
+		finalVal = []
+		async.each(add,
+		  // 2nd param is the function that each item is passed to
+		  function(item, callback){
+		    // Call an asynchronous function, often a save() to DB
+				kvsStatusContent.get(item, function (err, data) {
+					temp = JSON.parse(data[0]["value"])
+					temp["key"] = item
+					finalVal.push( temp );
+				  callback();
+		    });
+		  },
+		  // 3rd param is the function to call when everything's done
+		  function(err){
+		    // All tasks are done now
+		    	console.log(finalVal)
+				route_callbck({translation : finalVal}, null);
+		  }
+		);
+
+} 
 
 
 /*
