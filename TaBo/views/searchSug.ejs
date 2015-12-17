@@ -8,8 +8,9 @@
     var term = document.getElementById('searchBox').value;
     $.getJSON('http://localhost:8080/suggest/'+escape(term), function(err, resJSONString) {
         
-        var elements = JSON.parse(resJSONString);
+        
         if (err == null) {
+            var elements = JSON.parse(resJSONString);
             var l = elements.length;
             if (l > 5) {
                 l = 5;
@@ -34,6 +35,9 @@
     <form action="" method="" onSubmit="return false">
     <input type="text" name="thetext" size="20" id="searchBox" onKeyUp="updateSug()">
     <input type="submit" value="Replace">
+    
+    <!-- NOT VERY SURE WHAT THE SUBMIT SHOULD DO; COPIED FROM SLIDES // -->
+    
     </form>
     <div id="suggestedFriend"> </div>
     

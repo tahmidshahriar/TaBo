@@ -372,7 +372,25 @@ var searchSuggest = function(req, res) {
 	// res has two parts: err & data
 	var searchTerm = req.params.input;
 	
-	db.getSuggestions(searchTerm, function route_callbck(info, err) {
+	wl.general_wl(searchTerm, function callback(err) {
+		
+		var doCheck = false;
+		while (true) {
+			// wait until the update is complete
+			if (err) {
+				res.send(err, null);
+				break;
+			}
+			else {
+				doCheck = true;
+				break;				
+			}
+		}
+		
+	});
+	
+	if (doCheck) {
+		db.getSuggestions(searchTerm, function route_callbck(info, err) {
 				
 			while (true) {
 				// wait until the update is complete
@@ -386,7 +404,8 @@ var searchSuggest = function(req, res) {
 				}
 			}
 		});		
-	};
+	}
+};
 
 
 var routes = {
