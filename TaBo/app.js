@@ -27,6 +27,7 @@ app.get('/profile/:user', routes.get_homeOther);
 app.post('/createstatus', routes.post_createstatus);
 app.post('/createinterest', routes.post_createinterest);
 app.post('/createcomment', routes.post_createcomment);
+app.post('/createcomment/news', routes.post_createcommentNews);
 app.post('/addfriend', routes.post_addfriend);
 app.post('/acceptfriend', routes.post_acceptfriend);
 app.get('/getnews', routes.get_newsfeed);
