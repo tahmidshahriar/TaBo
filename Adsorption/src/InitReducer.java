@@ -21,12 +21,12 @@ Output:
 (~ to separate the weights & the adjacency list)
 (; to separate among the weights and among the adjacent nodes)
 (# to separate between two parts of a weight or a vertex)
-u#changbo 	1#changbo~u#tahmids;i#cycling;i#singing;a#penn
-u#tahmids	1#tahmids~u#changbo;i#drinking;a#penn
-i#cycling	~u#changbo
-i#singing	~u#changbo
-i#drinking	~u#tahmids
-a#penn	~u#changbo;u#tahmids
+u#changbo 	1#changbo~u#tahmids;i#cycling;i#singing;a#penn;
+u#tahmids	1#tahmids~u#changbo;i#drinking;a#penn;
+i#cycling	~u#changbo;
+i#singing	~u#changbo;
+i#drinking	~u#tahmids;
+a#penn	~u#changbo;u#tahmids;
 */
 
 	public void reduce(Text key, Iterable<Text> values,
@@ -42,8 +42,14 @@ a#penn	~u#changbo;u#tahmids
 				String s = v.toString();
 				String[] frags = s.split("~");
 				
-				String joined = StringUtils.join(frags, ";");
-				String outV = "1#" + ks[1] + joined; 
+				//String joined = StringUtils.join(frags, ";");
+				
+				String joined = "";
+				for (String f: frags) {
+					joined = joined + f + ";";
+				}
+				
+				String outV = "1#" + ks[1] + "~" + joined; 
 				context.write(key, new Text(outV));
 			}
 		}
@@ -53,7 +59,12 @@ a#penn	~u#changbo;u#tahmids
 			for (Text v : values) {
 				names.add(v.toString());
 			}
-			String joined = StringUtils.join(names, ";");
+			//String joined = StringUtils.join(names, ";");
+			
+			String joined = "";
+			for (String n: names) {
+				joined = joined + n + ";";
+			}
 			
 			String outV = "~" + joined; 
 			context.write(key, new Text(outV));

@@ -298,10 +298,12 @@ public class AdsorptionDriver {
 			double diff = Double.POSITIVE_INFINITY;
 			double threshold = 0.01;
 			
-			while (diff > threshold) {
+			int iterCount = 0;
+			while (diff > threshold && iterCount < 10) {
 				exitcode = doIterjob(iterArgs_1);
 				exitcode = doIterjob(iterArgs_2);
 				diff = doDiffjob(diffArgs);
+				iterCount ++;
 			}
 			
 		    String[] finiArgs = new String[4];
@@ -334,29 +336,29 @@ public class AdsorptionDriver {
 
 	// Given an output folder, returns the first double from the first
 	// part-r-00000 file
-	static double readDiffResult(String path) throws Exception {
-		double diffnum = 0.0;
-		Path diffpath = new Path(path);
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(URI.create(path), conf);
+		static double readDiffResult(String path) throws Exception {
+			double diffnum = 0.0;
+			Path diffpath = new Path(path);
+			Configuration conf = new Configuration();
+			FileSystem fs = FileSystem.get(URI.create(path), conf);
 
-		if (fs.exists(diffpath)) {
-			FileStatus[] ls = fs.listStatus(diffpath);
-			for (FileStatus file : ls) {
-				if (file.getPath().getName().startsWith("part-r-00000")) {
-					FSDataInputStream diffin = fs.open(file.getPath());
-					BufferedReader d = new BufferedReader(
-							new InputStreamReader(diffin));
-					String diffcontent = d.readLine();
-					diffnum = Double.parseDouble(diffcontent);
-					d.close();
+			if (fs.exists(diffpath)) {
+				FileStatus[] ls = fs.listStatus(diffpath);
+				for (FileStatus file : ls) {
+					if (file.getPath().getName().startsWith("part-r-00000")) {
+						FSDataInputStream diffin = fs.open(file.getPath());
+						BufferedReader d = new BufferedReader(
+								new InputStreamReader(diffin));
+						String diffcontent = d.readLine();
+						diffnum = Double.parseDouble(diffcontent);
+						d.close();
+					}
 				}
 			}
-		}
 
-		fs.close();
-		return diffnum;
-	}
+			fs.close();
+			return diffnum;
+		}
 
 	static void deleteDirectory(String path) throws Exception {
 		Path todelete = new Path(path);

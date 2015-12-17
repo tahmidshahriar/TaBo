@@ -6,12 +6,14 @@
         debug="true" debuglevel="lines,vars,source" includeantruntime="false">
       <classpath>
         <pathelement location="lib/hadoop-core-1.0.3.jar"/>
+      	<pathelement location="lib/commons-lang3-3.4.jar"/>
       </classpath>
     </javac>
   </target>
 
   <target name="jar" depends="javac" description="Create a jar file">
     <zip destfile="TaBoAdsorption.jar" basedir="classes"/>
+  	
   </target>
 
   <target name="pack" description="Create an archive for submission">

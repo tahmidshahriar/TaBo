@@ -16,8 +16,8 @@ Mapper<LongWritable, Text , Text, Text> {
 		String[] vKV = vString.split("\t");
 		String difference = vKV[1];
 		
-		// emit the change in rank calculated in the first diff MapReduce
-		// for each ID
+		// emit the change in label calculated in the first diff MapReduce
+		// for each vertex
 		context.write(new Text("placeholder"), new Text(difference));
 	}
 }

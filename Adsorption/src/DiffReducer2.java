@@ -19,7 +19,7 @@ Reducer<Text, Text , Text, Text> {
 			diffs.add(Double.parseDouble(vS));
 		}
 		
-		double max = 0;
+		double max = Double.NEGATIVE_INFINITY;
 		
 		// find the maximum change
 		for (Double d: diffs) {
@@ -30,7 +30,7 @@ Reducer<Text, Text , Text, Text> {
 		
 		Text outputK = new Text(Double.toString(max));
 				
-		// emit the maximum value as key and a trival value
+		// emit the maximum value as key and a trivial value
 		context.write(outputK, new Text(""));
 	}
 }

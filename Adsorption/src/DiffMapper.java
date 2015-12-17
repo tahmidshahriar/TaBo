@@ -38,6 +38,8 @@ Mapper<LongWritable, Text , Text, Text> {
 		String[] vFrags = vKV[1].split("~");
 		
 	    // output the vertex ID as key and weights as value
-		context.write(new Text(k), new Text(vFrags[0]));
+		if (vFrags[0].length() > 0) {
+			context.write(new Text(k), new Text(vFrags[0]));
+		}
 	}
 }

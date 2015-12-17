@@ -5,6 +5,14 @@ Which features did you implement?
   (list features, or write 'Entire assignment')
  Entire assignment
 
+
+
+Command line:
+
+hadoop jar TaBoAdsorption.jar AdsorptionDriver init inputdir intermdir1 1
+hadoop jar TaBoAdsorption.jar AdsorptionDriver composite inputdir outputdir intermdir1 intermdir2 diffdir 1
+
+
 Did you complete any extra-credit tasks? If so, which ones?
   (list extra-credit tasks)
   N/A

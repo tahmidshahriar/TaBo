@@ -10,21 +10,21 @@ import org.apache.hadoop.mapreduce.Reducer;
 /*
  * IterReducer
 	Input: 
-	u#tahmids	[“0.25#changbo”,“~u#changbo;i#drinking;a#penn“]
-i#cycling	[“0.25#changbo”,“~u#changbo“]
-i#singing	[“0.25#changbo”,“~u#changbo“]
-a#penn	[“0.25#changbo”,”0.33#tahmids”, “~u#changbo;u#tahmids”]
-u#changbo	[“0.33#tahmids”, “~u#tahmids;i#cycling;i#singing;a#penn”]
-i#drinking	[“0.33#tahmids”, “~u#tahmids”]
+	u#tahmids	[“0.25#changbo”,“~u#changbo;i#drinking;a#penn;“]
+i#cycling	[“0.25#changbo”,“~u#changbo;“]
+i#singing	[“0.25#changbo”,“~u#changbo;“]
+a#penn	[“0.25#changbo”,”0.33#tahmids”, “~u#changbo;u#tahmids;”]
+u#changbo	[“0.33#tahmids”, “~u#tahmids;i#cycling;i#singing;a#penn;”]
+i#drinking	[“0.33#tahmids”, “~u#tahmids;”]
 
 Output:    (for each key; add together the weights from each user) (trivial in this particular example)
 (for each vertex; need to build a HashMap to sum weights associated with each user)
-u#tahmids	0.25#changbo~u#changbo;i#drinking;a#penn
-i#cycling	0.25#changbo~u#changbo
-i#singing	0.25#changbo~u#changbo
-a#penn	0.25#changbo;0.33#tahmids~u#changbo;u#tahmids
-u#changbo	0.33#tahmids~u#tahmids;i#cycling;i#singing;a#penn
-i#drinking	0.33#tahmids~u#tahmids
+u#tahmids	0.25#changbo~u#changbo;i#drinking;a#penn;
+i#cycling	0.25#changbo~u#changbo;
+i#singing	0.25#changbo~u#changbo;
+a#penn	0.25#changbo;0.33#tahmids~u#changbo;u#tahmids;
+u#changbo	0.33#tahmids~u#tahmids;i#cycling;i#singing;a#penn;
+i#drinking	0.33#tahmids~u#tahmids;
  */
 
 class IterReducer extends Reducer<Text, Text, Text, Text> {
@@ -61,7 +61,12 @@ class IterReducer extends Reducer<Text, Text, Text, Text> {
 					Double.toString(summedWeights.get(l))  + "#" + l);
 		}
 		
-		String outV = StringUtils.join(outLabels, ";") + adjacency;
+		String outV = "";
+		for (String ol: outLabels) {
+			outV = outV + ol + ";";
+		}
+		
+		outV = outV + adjacency;
 		
 		context.write(key, new Text(outV));
 	}

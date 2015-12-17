@@ -21,32 +21,39 @@ a#penn		u#changbo
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
 		
-		String vString = value.toString();
+		String vString = value.toString().toLowerCase();
 		String[] vFrags = vString.split("\t");
 		
 		String username = "u#" + vFrags[0];
 		String[] vertices = vFrags[1].split("~");
 		
-		String[] friends = vertices[0].split(";");
-		String affiliation = vertices[1];
-		String[] interests = vertices[2].split(";");
+		
+		
+		
 		
 		String outString = "";
 		
-		for (int i = 0; i< friends.length;i++) {
-			friends[i] = "u#" + friends[i];
-			outString = outString + friends[i] + "~";
+		if (vertices[0].length() > 0) {
+			String[] friends = vertices[0].split(";");
+			for (int i = 0; i< friends.length;i++) {
+				friends[i] = "u#" + friends[i];
+				outString = outString + friends[i] + "~";
+			}
 		}
 		
-		for (int j = 0; j< interests.length;j++) {
-			interests[j] = "i#" + interests[j];
-			// emit an entry for each interest vertex
-			context.write(new Text(interests[j]), new Text(username));
-			outString = outString + interests[j] + "~";
-		}
-		
+		String affiliation = vertices[1];
 		affiliation = "a#" + affiliation;
-		outString = outString + affiliation;
+		outString = outString + affiliation + "~";
+		
+		if (vertices.length > 2) {
+			String[] interests = vertices[2].split(";");
+			for (int j = 0; j< interests.length;j++) {
+				interests[j] = "i#" + interests[j];
+				// emit an entry for each interest vertex
+				context.write(new Text(interests[j]), new Text(username));
+				outString = outString + interests[j] + "~";
+			}
+		}
 		
 		// emit an entry for the affiliation vertex
 		context.write(new Text(affiliation), new Text(username));
