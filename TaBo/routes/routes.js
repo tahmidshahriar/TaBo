@@ -28,7 +28,7 @@ var strict_wl = function(stringToCheck) {
 var general_wl = function(stringToCheck, callback) {
 	
 	var allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz" + 
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,";
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ!?., ";
 	
 	if (stringToCheck.length > 140 || stringToCheck.length < 1) {
 		return true
