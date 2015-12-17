@@ -28,8 +28,6 @@ db.getAllUsernames(function(data, err) {
 		callsLeft = data.length;
 		l = data.length;
 		
-		
-		
 		for (var j = 0; j < data.length; j++) {
 			
 			var nextKey = data[j].key;
@@ -129,7 +127,5 @@ db.getAllUsernames(function(data, err) {
 });
 
 }
-
-//getInputInfo(null, null);
 
 setTimeout(getInputInfo,10000);

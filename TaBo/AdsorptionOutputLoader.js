@@ -29,7 +29,6 @@ var async = require('async');
 
 var friendRecDBname = "friendRec";
 
-
 var fs = require('fs');
 var LineArray = fs.readFileSync('./AWSAdsorptionExchange/part-r-00000').toString().split("\n");
 var output = [];
