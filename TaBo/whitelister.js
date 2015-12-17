@@ -6,7 +6,7 @@
 // will not be slowed down too much
 // the callback function returns one value only: either error message OR null
 
-var strict_wl = function(stringToCheck, callback) {
+var my_strict_wl = function(stringToCheck, callback) {
 	
 	var allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 	var illegal = false;
@@ -38,7 +38,7 @@ var strict_wl = function(stringToCheck, callback) {
 
 //the callback function returns one value only: either error message OR null
 
-var general_wl = function(stringToCheck, callback) {
+var ,y_general_wl = function(stringToCheck, callback) {
 	
 	var allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz" + 
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,";
@@ -65,3 +65,9 @@ var general_wl = function(stringToCheck, callback) {
  	callback(null);
  }
 };
+
+var whitelister = {
+		strict_wl: my_strict_wl,
+		general_wl: my_general_wl
+}
+module.exports = whitelister;
