@@ -28,6 +28,7 @@ var signout = function(req, res) {
 };
 
 var checkLogin = function(req, res) {
+
 	console.log("LOGGING IN")
 	var user = req.body.user;
 	var pass = req.body.pass;
@@ -59,17 +60,6 @@ var checkLogin = function(req, res) {
 };
 
 
-var home = function(req, res) {
-	console.log("GOING TO PROFILE")
-	sess = req.session;
-	if (!sess.user  || sess.user == null) {
-		res.redirect('/')
-	}
-
-	else {
-		res.redirect('/profile/' + sess.user)
-	}
-};
 
 var homeOther = function(req, res) {
 	sess = req.session;
@@ -264,6 +254,7 @@ var news = function(req, res) {
 		res.redirect('/home')
 	}
 	else {
+		console.log(sess.user)
 		db.newsFeed(sess.user, function(data, err) {
 				
 				current = data.translation;

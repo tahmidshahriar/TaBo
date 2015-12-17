@@ -362,12 +362,10 @@ var myDB_addInterest = function(user, post, route_callbck) {
 		myVal = JSON.parse(data[0]["value"])
 		myInx = data[0]["inx"]
 		myVal.interestList.push(post)
-		console.log(myVal)
 		kvsUser.update(user, myInx, myVal, function(err, data) {
 			if (err) {
 				route_callbck(null, "Lookup error: " + err);
 			} else {
-				console.log(myVal);
 				route_callbck(null, null);
 			}
 		})
@@ -390,7 +388,6 @@ var myDB_addFriend = function(fr, sender, route_callbck) {
 						if (err) {
 							route_callbck(null, "Lookup error: " + err);
 						} else {
-							console.log(myVal);
 							route_callbck(null, null);
 						}
 					})
@@ -405,7 +402,6 @@ var myDB_addFriend = function(fr, sender, route_callbck) {
 					if (err) {
 						route_callbck(null, "Lookup error: " + err);
 					} else {
-						console.log(myVal);
 						route_callbck(null, null);
 					}
 				})
@@ -430,7 +426,6 @@ var myDB_acceptFriend = function(fr, me, route_callbck) {
 					if (err) {
 						route_callbck(null, "Lookup error: " + err);
 					} else {
-						console.log(myVal);
 						route_callbck(null, null);
 					}
 				})
@@ -444,13 +439,11 @@ var myDB_addComment = function(statusId, user, post, route_callbck) {
 	kvsStatusContent.get(statusId, function (err, data) {
 		myVal = JSON.parse(data[0]["value"])
 		myInx = data[0]["inx"]
-		console.log(myVal)
 		myVal.comments.push({ "commentor" : user, "commentContent" : post})
 		kvsStatusContent.update(statusId, myInx, myVal, function(err, data) {
 			if (err) {
 				route_callbck(null, "Lookup error: " + err);
 			} else {
-				console.log(myVal);
 				route_callbck(null, null);
 			}
 		})
@@ -503,7 +496,6 @@ function helper (add, route_callbck) {
 		  // 3rd param is the function to call when everything's done
 		  function(err){
 		    // All tasks are done now
-		    	console.log(finalVal)
 				route_callbck({translation : finalVal}, null);
 		  }
 		);
