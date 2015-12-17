@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.apache.hadoop.io.Text;
@@ -26,7 +27,8 @@ Reducer<Text, Text , Text, Text> {
 		
 		// calculate the difference in ranks and only output non-negative value
 		for(Text v: values) {
-			String[] frags = v.split("#");
+			String vv = v.toString();
+			String[] frags = vv.split("#");
 			String label = frags[1];
 			double weight = Double.parseDouble(frags[0]);
 
