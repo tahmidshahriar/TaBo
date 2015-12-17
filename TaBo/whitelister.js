@@ -38,7 +38,7 @@ var my_strict_wl = function(stringToCheck, callback) {
 
 //the callback function returns one value only: either error message OR null
 
-var ,y_general_wl = function(stringToCheck, callback) {
+var my_general_wl = function(stringToCheck, callback) {
 	
 	var allowedChars = "0123456789abcdefghijklmnopqrstuvwxyz" + 
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,";

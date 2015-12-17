@@ -1,6 +1,9 @@
 var db = require('../models/database.js');
 var credential = require('credential');
 var pw = credential();
+<<<<<<< HEAD
+var wl = require('../whitelister.js');
+=======
 
 
 // strict white listing for username so that it can only contain 
@@ -43,6 +46,7 @@ var general_wl = function(stringToCheck, callback) {
 		return false
 	}
 };
+>>>>>>> 4f0ed9aa9251a6d4de6d32e35adebc4abb30801e
 
 var getMain = function(req, res) {
 	console.log("GETTING MAIN PAGE")
@@ -363,6 +367,47 @@ var news = function(req, res) {
 };
 
 
+var searchSuggest = function(req, res) {
+	
+	// res has two parts: err & data
+	var searchTerm = req.params.input;
+	
+	wl.general_wl(searchTerm, function callback(err) {
+		
+		var doCheck = false;
+		while (true) {
+			// wait until the update is complete
+			if (err) {
+				res.send(err, null);
+				break;
+			}
+			else {
+				doCheck = true;
+				break;				
+			}
+		}
+		
+	});
+	
+	if (doCheck) {
+		db.getSuggestions(searchTerm, function route_callbck(info, err) {
+				
+			while (true) {
+				// wait until the update is complete
+				if (err) {
+					res.send(err, null);
+					break;
+				}
+				else if (info) {
+					res.send(null, info);
+					break;				
+				}
+			}
+		});		
+	}
+};
+
+
 var routes = {
 	get_main : getMain,
 	post_login : checkLogin,
@@ -377,6 +422,7 @@ var routes = {
 	post_addfriend : addfriend,
 	post_acceptfriend : acceptfriend,
 	get_newsfeed : news,
+	search_suggest: searchSuggest
 };
 
 module.exports = routes;

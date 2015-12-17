@@ -31,6 +31,9 @@ app.post('/createcomment/news', routes.post_createcommentNews);
 app.post('/addfriend', routes.post_addfriend);
 app.post('/acceptfriend', routes.post_acceptfriend);
 app.get('/getnews', routes.get_newsfeed);
+
+app.post('/suggest/:input', routes.search_suggest);
+
 /* Run the server */
 
 app.listen(8080);

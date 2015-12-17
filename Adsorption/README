@@ -1,31 +1,7 @@
 Full name:  _____Changbo Li_________
 SEAS login: ______changbo________
 
-Which features did you implement? 
-  (list features, or write 'Entire assignment')
- Entire assignment
-
-
-
-Command line:
-
-hadoop jar TaBoAdsorption.jar AdsorptionDriver init inputdir intermdir1 1
+Command line arguments:
 hadoop jar TaBoAdsorption.jar AdsorptionDriver composite inputdir outputdir intermdir1 intermdir2 diffdir 1
 
 
-Did you complete any extra-credit tasks? If so, which ones?
-  (list extra-credit tasks)
-  N/A
-
-Did you personally write _all_ the code you are submitting
-(other than code from the course web page)?
-  [V] Yes
-  [ ] No
-
-Did you copy any code from the Internet, or from classmates?
-  [ ] Yes
-  [V] No
-
-Did you collaborate with anyone on this assignment?
-  [ ] Yes
-  [V] No

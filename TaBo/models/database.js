@@ -1,6 +1,7 @@
 var keyvaluestore = require('../models/keyvaluestore.js');
-var kvsUser
-var kvsPassword
+var kvsUser;
+var kvsPassword;
+var kvsFriendRec;
 var credential = require('credential');
 var pw = credential();
 async = require("async");
@@ -11,6 +12,8 @@ kvsPassword = new keyvaluestore('passwords');
 kvsStatus = new keyvaluestore('userStatuses');
 kvsStatusContent = new keyvaluestore('statusContents');
 kvsLatest = new keyvaluestore('latests');
+kvsFriendRec =  new keyvaluestore('friendRec');
+
 kvsUser.init(function(err, data) {
 	console.log("User table loaded")
 });
@@ -21,14 +24,18 @@ kvsStatus.init(function(err, data) {
 	console.log("Status table loaded")
 });
 kvsStatusContent.init(function(err, data) {
-	console.log("Status Content table loaded")
+	console.log("StatusContent table loaded")
 });
 kvsLatest.init(function(err, data) {
 	console.log("Latest table loaded")
 });
 kvsNotif.init(function(err, data) {
-	console.log("Latest table loaded")
+	console.log("Notif table loaded")
 });
+kvsFriendRec.init(function(err, data) {
+	console.log("FriendRec table loaded")
+});
+
 /*
  * The function below is an example of a database method. Whenever you need to
  * access your database, you should define a function (myDB_addUser,
@@ -450,41 +457,6 @@ var myDB_addComment = function(statusId, user, post, route_callbck) {
 	})
 };
 
-var myDB_affiliation = function(aff, route_callbck) {
-	kvsUser.scanKeys(function(err, data) {
-		if (data == null) {
-			route_callbck(null, null);
-		}
-		else {
-			
-			a = []
-			for (var i = 0; i < data.length; i++) {
-				a.push(data[i]["key"])
-			}
-
-			add = []
-			async.each(a,
-		  // 2nd param is the function that each item is passed to
-		  function(item, callback){
-		    // Call an asynchronous function, often a save() to DB
-				kvsUser.get(item, function (err, data) {
-					temp = (JSON.parse(data[0]["value"])).affiliation
-					if (temp == aff) {
-						add.push( item );
-					}
-				  callback();
-		    });
-		  },
-		  // 3rd param is the function to call when everything's done
-		  function(err){
-		    // All tasks are done now
-		    console.log(add)
-			route_callbck({translation : add}, null);
-		  }
-		);
-	}
-})
-};
 
 
 var myDB_newsFeed = function(user, route_callbck) {
@@ -537,6 +509,60 @@ function helper (add, route_callbck) {
 
 } 
 
+//return the list of all usernames as an array of {key: xxx, inx: yyy} dictionaries
+var myDB_getAllUsernames = function(route_callbck) {
+	console.log('Pulling all user names');
+
+	kvsUser.scanKeys(function(err, data) {
+		
+		// the callback function has two fields (data, error)
+		if (err) {
+			console.log("Oops, error when pulling usernames");
+			route_callbck(null, err);
+		}
+		else {
+			console.log("Here is the data: " + data);
+			route_callbck(data, null);
+		}
+
+	});
+};
+
+//given a username, return an array [name, data]
+//where the data is an array of {inx: xxx, value: yyy} dictionaries
+//the yyy part is a stringified JSON representation of the information 
+
+var myDB_getUserInfo = function(uName, route_callbck) {
+
+	console.log('Finding information about the user: ' + uName);
+	kvsUser.get(uName, function(err, data) {
+		if (err) {
+			route_callbck(null, "Finding user info error: " + err);
+		} else if (data == null) {
+			route_callbck(null, null);
+		} else if (data.length == 0) {
+			route_callbck(null, null);
+		} else {
+			route_callbck([uName, data], null);
+		}
+	});
+};
+
+var myDB_getSuggestions = function(uName, route_callbck) {
+
+	console.log('Finding information about the user: ' + uName);
+	kvsFriendRec.get(uName, function(err, data) {
+		if (err) {
+			route_callbck(null, "Finding user info error: " + err);
+		} else if (data == null) {
+			route_callbck(null, null);
+		} else if (data.length == 0) {
+			route_callbck(null, null);
+		} else {
+			route_callbck(data, null);
+		}
+	});
+};
 
 /*
  * We define an object with one field for each method. For instance, below we
@@ -558,7 +584,10 @@ var database = {
 	addFriend : myDB_addFriend,
 	acceptFriend : myDB_acceptFriend,
 	newsFeed : myDB_newsFeed,
-	affiliation : myDB_affiliation
+	getAllUsernames: myDB_getAllUsernames,
+	getUserInfo: myDB_getUserInfo,
+	
+	getSuggestions: myDB_getSuggestions
 };
 
 module.exports = database;

@@ -8,8 +8,6 @@ var async = require('async');
 
 var inputInfo = [];
 
-// var adsorptionInputDB = db.kvsUser;
-
 // UserID will be between 8 and 15 (inclusive) in length, and only contain
 // lowercase alphabets or 0 to 9
 
@@ -27,8 +25,6 @@ db.getAllUsernames(function(data, err) {
 		
 		callsLeft = data.length;
 		l = data.length;
-		
-		
 		
 		for (var j = 0; j < data.length; j++) {
 			
@@ -129,7 +125,5 @@ db.getAllUsernames(function(data, err) {
 });
 
 }
-
-//getInputInfo(null, null);
 
 setTimeout(getInputInfo,10000);
